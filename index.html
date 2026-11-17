@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devis Toitures Florian et Brian</title>
+<style>
+  :root {
+    --primary: #1e293b;
+    --accent: #ea580c;
+    --accent-hover: #c2410c;
+    --blue: #2563eb;
+    --blue-hover: #1d4ed8;
+    --green: #16a34a;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --border: #cbd5e1;
+    --text: #0f172a;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* BARRE SUPÉRIEURE */
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-icon {
+    background: var(--accent);
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+  }
+  .brand h1 { margin: 0; font-size: 1.25rem; }
+  .brand p { margin: 2px 0 0; font-size: 0.82rem; color: #94a3b8; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.15s;
+  }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: var(--accent-hover); }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-blue:hover { background: var(--blue-hover); }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover { background: #15803d; }
+  .btn-dark { background: #334155; color: #fff; }
+  .btn-dark:hover { background: #475569; }
+  .btn-danger { background: #dc2626; color: #fff; padding: 6px 10px; font-size: 0.8rem; }
+  .btn-danger:hover { background: #b91c1c; }
+
+  /* BANDEAU CLIENT */
+  .client-bar {
+    max-width: 1440px;
+    margin: 16px auto 0;
+    padding: 0 16px;
+  }
+  .client-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: flex-end;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+
+  /* LAYOUT PRINCIPAL */
+  .main-grid {
+    max-width: 1440px;
+    margin: 16px auto 30px;
+    padding: 0 16px;
+    display: grid;
+    grid-template-columns: 1.25fr 0.95fr;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 1024px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ONGLETS */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: #fff;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .tab-btn {
+    flex: 1 1 auto;
+    border: none;
+    background: transparent;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .tab-btn:hover { background: #f1f5f9; color: var(--text); }
+  .tab-btn.active { background: var(--primary); color: #fff; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* CARTES & FORMULAIRES */
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .card h2 {
+    margin: 0 0 6px;
+    font-size: 1.08rem;
+    color: var(--primary);
+  }
+  .sub { font-size: 0.84rem; color: var(--muted); margin: 0 0 14px; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+  .field { flex: 1 1 130px; display: flex; flex-direction: column; }
+  .field label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  input[type="text"], input[type="number"], select {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.94rem;
+    width: 100%;
+    background: #fff;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  }
+
+  /* BLOCS COCHABLES */
+  .toggle-block {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    background: #f8fafc;
+    transition: 0.15s;
+  }
+  .toggle-block.checked {
+    background: #fff;
+    border-color: var(--blue);
+    box-shadow: 0 2px 6px rgba(37,99,235,0.08);
+  }
+  .toggle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.96rem;
+  }
+  .toggle-left input[type="checkbox"] {
+    width: 19px;
+    height: 19px;
+    cursor: pointer;
+    accent-color: var(--blue);
+  }
+  .toggle-body {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #cbd5e1;
+    display: none;
+  }
+  .toggle-block.checked .toggle-body { display: block; }
+
+  /* PANS & SVG */
+  .pan-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #f8fafc;
+  }
+  .pan-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .pan-badge {
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .pan-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 0.9fr;
+    gap: 14px;
+    align-items: center;
+  }
+  @media (max-width: 680px) { .pan-grid { grid-template-columns: 1fr; } }
+  .svg-preview {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+  }
+
+  /* SÉLECTEUR EXCLUSIF M.O. & ÉQUIPE */
+  .seg-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .seg-btn {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--border);
+    background: #f8fafc;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--muted);
+    transition: 0.15s;
+  }
+  .seg-btn.active {
+    border-color: var(--accent);
+    background: #fff7ed;
+    color: var(--accent-hover);
+  }
+
+  /* COLONNE DROITE : RÉCAPITULATIF SOMBRE */
+  .recap-panel {
+    background: var(--primary);
+    color: #f8fafc;
+    border-radius: 14px;
+    padding: 20px;
+    position: sticky;
+    top: 16px;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.18);
+  }
+  .recap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .recap-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .kpi {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+  }
+  .kpi-label { font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; }
+  .kpi-val { font-size: 1.05rem; font-weight: 800; color: #fb923c; margin-top: 2px; }
+
+  .compteurs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .compteur-item {
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+  }
+  .compteur-badge {
+    background: rgba(234,88,12,0.25);
+    border: 1px solid rgba(251,146,60,0.45);
+    color: #fed7aa;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .devis-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin-bottom: 14px;
+  }
+  .devis-table th {
+    text-align: left;
+    color: #94a3b8;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .devis-table td {
+    padding: 7px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .num { text-align: right; white-space: nowrap; }
+
+  .totaux-box {
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .tot-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #cbd5e1;
+  }
+  .tot-ttc {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #4ade80;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 8px;
+    margin-top: 6px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #16a34a;
+    color: #fff;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: 0.25s;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @media print {
+    body { background: #fff; }
+    header, .tabs, .left-col, .toast, .no-print { display: none !important; }
+    .main-grid { display: block; }
+    .recap-panel {
+      background: #fff;
+      color: #000;
+      box-shadow: none;
+      border: 1px solid #ccc;
+      position: static;
+    }
+    .kpi, .compteur-item, .totaux-box { background: #f8fafc; color: #000; border: 1px solid #ddd; }
+    .kpi-val, .tot-ttc { color: #000; }
+    .devis-table th, .devis-table td, .tot-line { color: #000; border-color: #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🏠</div>
+    <div>
+      <h1>Devis Toitures Florian et Brian</h1>
+      <p>Outil rapide de métré, comptage matériaux &amp; estimation avant devis</p>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button class="btn btn-accent" onclick="genererEtActualiser()">⚡ Générer / Actualiser</button>
+    <button class="btn btn-blue" onclick="sauvegarderSous()">💾 Sauvegarder sous...</button>
+    <button class="btn btn-dark" onclick="document.getElementById('fileInput').click()">📂 Ouvrir dossier</button>
+    <input type="file" id="fileInput" accept=".json" style="display:none" onchange="ouvrirDossier(event)">
+    <button class="btn btn-dark" onclick="nouveauChantierVierge()">🗑️ Nouveau chantier (vierge)</button>
+    <button class="btn btn-green" onclick="window.print()">🖨️ Imprimer / PDF</button>
+  </div>
+</header>
+
+<!-- LIGNE CLIENT -->
+<div class="client-bar">
+  <div class="client-card">
+    <div class="field" style="flex: 1.5 1 240px;">
+      <label>Nom &amp; Prénom du futur devis client</label>
+      <input type="text" id="clientNom" placeholder="Ex : Dupont Jean-Marc" oninput="calculerTout()">
+    </div>
+    <div class="field" style="flex: 2 1 280px;">
+      <label>Adresse / Chantier (optionnel)</label>
+      <input type="text" id="clientAdresse" placeholder="Ex : 12 rue des Tilleuls, 35000 Rennes" oninput="calculerTout()">
+    </div>
+    <div class="field" style="flex: 0.7 1 130px;">
+      <label>Marge chutes (%)</label>
+      <input type="number" id="margeChutes" class="tarif-memo" value="8" min="0" max="50" step="1" oninput="sauverTarifs(); calculerTout()">
+    </div>
+    <div class="field" style="flex: 0.7 1 120px;">
+      <label>TVA (%)</label>
+      <select id="tvaSelect" class="tarif-memo" onchange="sauverTarifs(); calculerTout()">
+        <option value="0">0 %</option>
+        <option value="5.5">5,5 %</option>
+        <option value="10" selected>10 %</option>
+        <option value="20">20 %</option>
+      </select>
+    </div>
+    <button class="btn btn-dark no-print" style="padding:8px 11px;font-size:0.78rem;" onclick="reinitialiserTarifs()" title="Remettre les prix par défaut">↺ Tarifs défaut</button>
+  </div>
+</div>
+
+<div class="main-grid">
+  <!-- COLONNE GAUCHE : SAISIE -->
+  <div class="left-col">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="ouvrirOnglet(0, this)">1. Pans &amp; Schémas</button>
+      <button class="tab-btn" onclick="ouvrirOnglet(1, this)">2. Bois &amp; Écran</button>
+      <button class="tab-btn" onclick="ouvrirOnglet(2, this)">3. Couverture</button>
+      <button class="tab-btn" onclick="ouvrirOnglet(3, this)">4. Gouttières &amp; Zinc</button>
+      <button class="tab-btn" onclick="ouvrirOnglet(4, this)">5. Faîtage, M.O. &amp; Libres</button>
+    </div>
+
+    <!-- ONGLET 1 : PANS DE TOITURE -->
+    <div class="panel active" id="panel-0">
+      <div class="card">
+        <h2>1. Géométrie des pans de toiture</h2>
+        <p class="sub">Démarrage vierge : ajoutez uniquement les pans nécessaires (rectangles ou morceaux en triangle à gauche, droite ou croupe).</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+          <button class="btn btn-blue" onclick="ajouterPan('rectangle')">+ Rectangle ▭</button>
+          <button class="btn btn-accent" onclick="ajouterPan('triangle_gauche')">+ Triangle Gauche ◢</button>
+          <button class="btn btn-accent" onclick="ajouterPan('triangle_droite')">+ Triangle Droite ◣</button>
+          <button class="btn btn-dark" onclick="ajouterPan('croupe')">+ Croupe ▲</button>
+        </div>
+        <div id="listePans">
+          <div style="text-align:center; padding:24px; color:var(--muted); border:1px dashed var(--border); border-radius:10px;">
+            Aucun pan ajouté pour le moment. Cliquez sur un bouton ci-dessus pour commencer.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONGLET 2 : BOIS & ÉCRAN -->
+    <div class="panel" id="panel-1">
+      <div class="card">
+        <h2>2. Charpente, Bois &amp; Écran sous-toiture</h2>
+        <p class="sub">Cochez les éléments à inclure. Vos prix au mètre linéaire ou au m² restent mémorisés automatiquement.</p>
+
+        <!-- CHEVRONS -->
+        <div class="toggle-block" id="blk-chevrons">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-chevrons" onchange="toggleBloc('chevrons')"> Chevrons (structure)</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Calcul en barres</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Section (ex: 60×80)</label><input type="text" id="chevSection" value="60×80 mm" oninput="calculerTout()"></div>
+              <div class="field"><label>Entraxe (cm)</label><input type="number" id="chevEntraxe" value="60" min="10" oninput="calculerTout()"></div>
+              <div class="field"><label>Longueur barre (m)</label><input type="number" id="chevLongBarre" value="5" step="0.5" min="1" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix (€ / ml HT)</label><input type="number" id="chevPrixML" class="tarif-memo" value="6.50" step="0.10" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TASSEAUX / LITEAUX -->
+        <div class="toggle-block" id="blk-tasseaux">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-tasseaux" onchange="toggleBloc('tasseaux')"> Tasseaux / Liteaux horizontaux</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Calcul en barres</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Section</label><input type="text" id="tasSection" value="27×40 mm" oninput="calculerTout()"></div>
+              <div class="field"><label>Pureau / Écart. (cm)</label><input type="number" id="tasEcart" value="35" min="5" oninput="calculerTout()"></div>
+              <div class="field"><label>Longueur barre (m)</label><input type="number" id="tasLongBarre" value="4" step="0.5" min="1" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix (€ / ml HT)</label><input type="number" id="tasPrixML" class="tarif-memo" value="1.80" step="0.05" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTRE-LATTES -->
+        <div class="toggle-block" id="blk-contrelattes">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-contrelattes" onchange="toggleBloc('contrelattes')"> Contre-lattes (lame d'air sur chevrons)</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Calcul en barres</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Section</label><input type="text" id="clSection" value="20×40 mm" oninput="calculerTout()"></div>
+              <div class="field"><label>Entraxe (cm)</label><input type="number" id="clEntraxe" value="60" min="10" oninput="calculerTout()"></div>
+              <div class="field"><label>Longueur barre (m)</label><input type="number" id="clLongBarre" value="4" step="0.5" min="1" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix (€ / ml HT)</label><input type="number" id="clPrixML" class="tarif-memo" value="1.50" step="0.05" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ÉCRAN SOUS-TOITURE -->
+        <div class="toggle-block" id="blk-ecran">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-ecran" onchange="toggleBloc('ecran')"> Écran sous-toiture HPV</span>
+            <span style="font-size:0.8rem;color:var(--muted);">+10 % recouvrement</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Désignation</label><input type="text" id="ecranNom" value="Écran sous-toiture HPV respirant" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix (€ / m² HT)</label><input type="number" id="ecranPrixM2" class="tarif-memo" value="4.20" step="0.10" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONGLET 3 : COUVERTURE -->
+    <div class="panel" id="panel-2">
+      <div class="card">
+        <h2>3. Matériaux de couverture &amp; fixations</h2>
+        <p class="sub">Ajoutez une ou plusieurs lignes de couverture (ardoises, tuiles, tôles bac acier, zinc...).</p>
+        <button class="btn btn-blue" style="margin-bottom:14px;" onclick="ajouterCouverture()">+ Ajouter une couverture</button>
+        <div id="listeCouvertures">
+          <div style="text-align:center; padding:20px; color:var(--muted); border:1px dashed var(--border); border-radius:10px;">
+            Aucune couverture ajoutée. Cliquez sur « + Ajouter une couverture ».
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONGLET 4 : GOUTTIÈRES & ZINGUERIE -->
+    <div class="panel" id="panel-3">
+      <div class="card">
+        <h2>4. Gouttières, Descentes &amp; Zinguerie</h2>
+        <p class="sub">Cochez uniquement les éléments nécessaires au chantier.</p>
+
+        <!-- GOUTTIÈRES + CROCHETS -->
+        <div class="toggle-block" id="blk-gouttiere">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-gouttiere" onchange="toggleBloc('gouttiere')"> Gouttières + Crochets de gouttière</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Calcul sur longueur d'égout</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Type / Matière</label><input type="text" id="goutNom" value="Gouttière zinc demi-ronde D.33" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix gouttière (€/ml)</label><input type="number" id="goutPrixML" class="tarif-memo" value="18.00" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+              <div class="field"><label>Entraxe crochets (cm)</label><input type="number" id="goutEntraxeCrochet" value="50" min="20" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix 1 crochet (€/u)</label><input type="number" id="goutPrixCrochet" class="tarif-memo" value="2.80" step="0.10" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>Nb naissances / moignons</label><input type="number" id="goutNbNaissances" value="2" min="0" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix naissance (€/u)</label><input type="number" id="goutPrixNaissance" class="tarif-memo" value="9.50" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+              <div class="field"><label>Nb talons / fonds</label><input type="number" id="goutNbTalons" value="2" min="0" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix talon (€/u)</label><input type="number" id="goutPrixTalon" class="tarif-memo" value="4.50" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DESCENTES + COLLIERS MUR -->
+        <div class="toggle-block" id="blk-descente">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-descente" onchange="toggleBloc('descente')"> Tuyaux de descente + Colliers fixation mur</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Colliers auto tous les 1,5 m</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Nb descentes</label><input type="number" id="descNb" value="2" min="1" oninput="calculerTout()"></div>
+              <div class="field"><label>Hauteur par descente (m)</label><input type="number" id="descHaut" value="3.5" step="0.5" min="0.5" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix tuyau (€/ml)</label><input type="number" id="descPrixML" class="tarif-memo" value="16.50" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>Prix collier mur (€/u)</label><input type="number" id="descPrixCollier" class="tarif-memo" value="4.20" step="0.10" oninput="sauverTarifs(); calculerTout()"></div>
+              <div class="field"><label>Nb coudes</label><input type="number" id="descNbCoudes" value="4" min="0" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix coude (€/u)</label><input type="number" id="descPrixCoude" class="tarif-memo" value="8.90" step="0.10" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BANDES DE RIVE & ÉGOUT -->
+        <div class="toggle-block" id="blk-rives">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-rives" onchange="toggleBloc('rives')"> Bandes de rive &amp; Bandes d'égout</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Habillage zinc / alu</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Prix bande de rive (€/ml)</label><input type="number" id="rivePrixML" class="tarif-memo" value="14.00" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+              <div class="field"><label>Inclure bande d'égout ?</label>
+                <select id="egoActif" onchange="calculerTout()">
+                  <option value="oui">Oui (sur égout)</option>
+                  <option value="non">Non</option>
+                </select>
+              </div>
+              <div class="field"><label>Prix bande d'égout (€/ml)</label><input type="number" id="egoPrixML" class="tarif-memo" value="11.00" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOLIN / NOUE -->
+        <div class="toggle-block" id="blk-solin">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-solin" onchange="toggleBloc('solin')"> Solin mural / Noue zinc</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Saisie au mètre linéaire</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Désignation</label><input type="text" id="solinNom" value="Porte-solin zinc + mastic" oninput="calculerTout()"></div>
+              <div class="field"><label>Longueur (ml)</label><input type="number" id="solinML" value="5" step="0.5" min="0" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix (€/ml)</label><input type="number" id="solinPrixML" class="tarif-memo" value="19.00" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONGLET 5 : FAÎTAGE, M.O. & LIGNES LIBRES -->
+    <div class="panel" id="panel-4">
+      <div class="card">
+        <h2>5. Faîtage, Main-d'œuvre &amp; Lignes libres</h2>
+
+        <!-- FAÎTAGE -->
+        <div class="toggle-block" id="blk-faitage">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-faitage" onchange="toggleBloc('faitage')"> Faîtage + Closoir ventilé</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Sur longueur de faîtage</span>
+          </label>
+          <div class="toggle-body">
+            <div class="row">
+              <div class="field"><label>Type faîtière</label><input type="text" id="faitNom" value="Faîtière + closoir ventilé" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix faîtage (€/ml)</label><input type="number" id="faitPrixML" class="tarif-memo" value="24.00" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+              <div class="field"><label>Nb chatières ventilation</label><input type="number" id="nbChatieres" value="2" min="0" oninput="calculerTout()"></div>
+              <div class="field"><label>Prix chatière (€/u)</label><input type="number" id="prixChatiere" class="tarif-memo" value="18.00" step="0.50" oninput="sauverTarifs(); calculerTout()"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN D'OEUVRE EXCLUSIVE (m² OU heure) -->
+        <div class="toggle-block" id="blk-mo">
+          <label class="toggle-header">
+            <span class="toggle-left"><input type="checkbox" id="chk-mo" onchange="toggleBloc('mo')"> Main-d'œuvre (M.O.)</span>
+            <span style="font-size:0.8rem;color:var(--muted);">Au m² OU à l'heure</span>
+          </label>
+          <div class="toggle-body">
+            <div class="seg-group">
+              <button type="button" class="seg-btn active" id="btnMoM2" onclick="setModeMO('m2')">📐 Tarif au mètre carré (€/m²)</button>
+              <button type="button" class="seg-btn" id="btnMoHeure" onclick="setModeMO('heure')">⏱️ Tarif à l'heure (€/h)</button>
+            </div>
+
+            <!-- Option M2 -->
+            <div id="zoneMoM2">
+              <div class="row">
+                <div class="field">
+                  <label>Prix Main-d'œuvre (€ / m² HT)</label>
+                  <input type="number" id="moPrixM2" class="tarif-memo" value="35.00" step="1" oninput="sauverTarifs(); calculerTout()">
+                </div>
+              </div>
+            </div>
+
+            <!-- Option Heure -->
+            <div id="zoneMoHeure" style="display:none;">
+              <label style="display:block;font-size:0.78rem;font-weight:700;color:#475569;margin-bottom:6px;text-transform:uppercase;">Effectif sur le chantier</label>
+              <div class="seg-group">
+                <button type="button" class="seg-btn active" id="btnPers1" onclick="setNbPersonnes(1)">👤 1 personne (Florian seul)</button>
+                <button type="button" class="seg-btn" id="btnPers2" onclick="setNbPersonnes(2)">👥 2 personnes (Florian + Brian)</button>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label>Nombre d'heures de chantier</label>
+                  <input type="number" id="moNbHeures" value="8" min="0.5" step="0.5" oninput="calculerTout()">
+                </div>
+                <div class="field">
+                  <label>Tarif horaire par personne (€/h HT)</label>
+                  <input type="number" id="moPrixHeure" class="tarif-memo" value="48.00" step="1" oninput="sauverTarifs(); calculerTout()">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIGNES LIBRES (VELUX, ÉCLAIRAGE, ÉCHAFAUDAGE...) -->
+        <div style="margin-top:16px;">
+          <h3 style="font-size:0.98rem;margin:0 0 6px;color:var(--primary);">✨ Lignes libres (Velux, éclairage, échafaudage, divers...)</h3>
+          <p class="sub">Ajoutez n'importe quelle fourniture ou prestation supplémentaire avec quantité, unité et prix.</p>
+          <button class="btn btn-blue" style="margin-bottom:10px;" onclick="ajouterLigneLibre()">+ Ajouter une ligne libre</button>
+          <div id="listeLibres"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLONNE DROITE : RÉCAPITULATIF -->
+  <div class="recap-panel">
+    <div class="recap-header">
+      <div>
+        <div style="font-size:0.72rem;color:#fb923c;font-weight:700;letter-spacing:0.05em;">DEVIS TOITURES FLORIAN ET BRIAN</div>
+        <h2 style="margin:2px 0 0;font-size:1.15rem;" id="recapTitreClient">Récapitulatif &amp; Comptage</h2>
+        <div style="font-size:0.8rem;color:#94a3b8;" id="recapSubClient">Chantier vierge — sélectionnez vos éléments</div>
+      </div>
+      <button class="btn btn-blue no-print" style="padding:7px 11px;font-size:0.8rem;" onclick="copierListe()">📋 Copier la liste</button>
+    </div>
+
+    <div class="recap-kpis">
+      <div class="kpi"><div class="kpi-label">Surface</div><div class="kpi-val" id="kpiSurface">0 m²</div></div>
+      <div class="kpi"><div class="kpi-label">Égout</div><div class="kpi-val" id="kpiEgout">0 ml</div></div>
+      <div class="kpi"><div class="kpi-label">Rives / Biais</div><div class="kpi-val" id="kpiRives">0 ml</div></div>
+      <div class="kpi"><div class="kpi-label">Faîtage</div><div class="kpi-val" id="kpiFaitage">0 ml</div></div>
+    </div>
+
+    <div class="compteurs-grid" id="zoneCompteurs"></div>
+
+    <table class="devis-table">
+      <thead>
+        <tr>
+          <th>Désignation</th>
+          <th class="num">Qté</th>
+          <th class="num">P.U. HT</th>
+          <th class="num">Total HT</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:18px 0;">Aucun élément sélectionné (0,00 €)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="totaux-box">
+      <div class="tot-line"><span>Total Fournitures HT</span><span id="totFournitures">0,00 €</span></div>
+      <div class="tot-line"><span>Total Main-d'œuvre &amp; Libres HT</span><span id="totMO">0,00 €</span></div>
+      <div class="tot-line" style="font-weight:700;color:#fff;"><span>Total Général HT</span><span id="totHT">0,00 €</span></div>
+      <div class="tot-line"><span id="labelTVA">TVA (10 %)</span><span id="totTVA">0,00 €</span></div>
+      <div class="tot-ttc"><span>ESTIMATION TTC</span><span id="totTTC">0,00 €</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_TARIFS_KEY = 'florian_brian_tarifs_v1';
+
+let pans = [];
+let couvertures = [];
+let lignesLibres = [];
+let modeMO = 'm2';       // 'm2' ou 'heure'
+let nbPersonnes = 1;     // 1 (Florian) ou 2 (Florian + Brian)
+let dernierTexteCopie = '';
+
+const TARIFS_DEFAUT = {
+  margeChutes: 8,
+  tvaSelect: '10',
+  chevPrixML: 6.50,
+  tasPrixML: 1.80,
+  clPrixML: 1.50,
+  ecranPrixM2: 4.20,
+  goutPrixML: 18.00,
+  goutPrixCrochet: 2.80,
+  goutPrixNaissance: 9.50,
+  goutPrixTalon: 4.50,
+  descPrixML: 16.50,
+  descPrixCollier: 4.20,
+  descPrixCoude: 8.90,
+  rivePrixML: 14.00,
+  egoPrixML: 11.00,
+  solinPrixML: 19.00,
+  faitPrixML: 24.00,
+  prixChatiere: 18.00,
+  moPrixM2: 35.00,
+  moPrixHeure: 48.00,
+  defArdoisePrix: 32.00,
+  defCrochetArdoisePrix: 0.35,
+  defTuilePrix: 28.00,
+  defPlaquePrix: 22.00,
+  defTirefondPrix: 0.45
+};
+
+let tarifsMemo = { ...TARIFS_DEFAUT };
+
+function chargerTarifs() {
+  try {
+    const saved = localStorage.getItem(STORAGE_TARIFS_KEY);
+    if (saved) tarifsMemo = { ...TARIFS_DEFAUT, ...JSON.parse(saved) };
+  } catch (e) {}
+  Object.keys(TARIFS_DEFAUT).forEach(id => {
+    const el = document.getElementById(id);
+    if (el && tarifsMemo[id] !== undefined) el.value = tarifsMemo[id];
+  });
+}
+
+function sauverTarifs() {
+  Object.keys(TARIFS_DEFAUT).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) tarifsMemo[id] = el.value;
+  });
+  try {
+    localStorage.setItem(STORAGE_TARIFS_KEY, JSON.stringify(tarifsMemo));
+  } catch (e) {}
+}
+
+function reinitialiserTarifs() {
+  if (!confirm("Remettre tous les prix unitaires aux valeurs par défaut ?")) return;
+  localStorage.removeItem(STORAGE_TARIFS_KEY);
+  tarifsMemo = { ...TARIFS_DEFAUT };
+  chargerTarifs();
+  calculerTout();
+  afficherToast("Tarifs par défaut restaurés");
+}
+
+function afficherToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function ouvrirOnglet(idx, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + idx).classList.add('active');
+}
+
+function toggleBloc(nom) {
+  const chk = document.getElementById('chk-' + nom).checked;
+  document.getElementById('blk-' + nom).classList.toggle('checked', chk);
+  calculerTout();
+}
+
+/* ==========================================
+   1. PANS DE TOITURE & SCHÉMAS SVG
+   ========================================== */
+function ajouterPan(forme) {
+  const labels = {
+    rectangle: 'Pan rectangulaire',
+    triangle_gauche: 'Triangle gauche',
+    triangle_droite: 'Triangle droite',
+    croupe: 'Croupe triangulaire'
+  };
+  pans.push({
+    id: Date.now() + Math.random(),
+    forme,
+    nom: `${labels[forme]} ${pans.length + 1}`,
+    longueur: 10,
+    pente: 5,
+    qte: 1
+  });
+  renderPans();
+  calculerTout();
+}
+
+function supprimerPan(id) {
+  pans = pans.filter(p => p.id !== id);
+  renderPans();
+  calculerTout();
+}
+
+function majPan(id, champ, val) {
+  const p = pans.find(x => x.id === id);
+  if (!p) return;
+  p[champ] = (champ === 'nom' || champ === 'forme') ? val : (parseFloat(val) || 0);
+  renderPans();
+  calculerTout();
+}
+
+function genererSVG(p) {
+  const L = p.longueur || 0;
+  const H = p.pente || 0;
+  let surf = 0, hypo = 0, shape = '';
+  if (p.forme === 'rectangle') {
+    surf = L * H;
+    shape = `<rect x="35" y="25" width="130" height="65" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+             <text x="100" y="18" font-size="10" text-anchor="middle" fill="#475569">Faîtage : ${L}m</text>
+             <text x="100" y="103" font-size="10" text-anchor="middle" fill="#475569">Égout : ${L}m</text>
+             <text x="20" y="60" font-size="10" text-anchor="middle" fill="#475569">${H}m</text>`;
+  } else if (p.forme === 'triangle_gauche') {
+    surf = (L * H) / 2;
+    hypo = Math.hypot(L, H);
+    shape = `<polygon points="35,90 165,90 165,25" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+             <text x="90" y="52" font-size="10" text-anchor="middle" fill="#c2410c">Biais ${hypo.toFixed(2)}m</text>
+             <text x="100" y="103" font-size="10" text-anchor="middle" fill="#475569">Base : ${L}m</text>
+             <text x="182" y="60" font-size="10" text-anchor="middle" fill="#475569">${H}m</text>`;
+  } else if (p.forme === 'triangle_droite') {
+    surf = (L * H) / 2;
+    hypo = Math.hypot(L, H);
+    shape = `<polygon points="35,25 35,90 165,90" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+             <text x="115" y="52" font-size="10" text-anchor="middle" fill="#c2410c">Biais ${hypo.toFixed(2)}m</text>
+             <text x="100" y="103" font-size="10" text-anchor="middle" fill="#475569">Base : ${L}m</text>
+             <text x="18" y="60" font-size="10" text-anchor="middle" fill="#475569">${H}m</text>`;
+  } else {
+    surf = (L * H) / 2;
+    hypo = Math.hypot(L / 2, H);
+    shape = `<polygon points="35,90 165,90 100,25" fill="#e2e8f0" stroke="#334155" stroke-width="2"/>
+             <text x="100" y="103" font-size="10" text-anchor="middle" fill="#475569">Égout : ${L}m</text>
+             <text x="100" y="75" font-size="10" text-anchor="middle" fill="#1e293b">Arêtiers 2×${hypo.toFixed(2)}m</text>`;
+  }
+  const totSurf = (surf * p.qte).toFixed(2);
+  return `<svg width="200" height="112" viewBox="0 0 200 112">
+    ${shape}
+    <text x="100" y="62" font-size="11" font-weight="bold" text-anchor="middle" fill="#0f172a">${totSurf} m²</text>
+  </svg>`;
+}
+
+function renderPans() {
+  const cont = document.getElementById('listePans');
+  if (pans.length === 0) {
+    cont.innerHTML = `<div style="text-align:center; padding:24px; color:var(--muted); border:1px dashed var(--border); border-radius:10px;">
+      Aucun pan ajouté pour le moment. Cliquez sur un bouton ci-dessus pour commencer.
+    </div>`;
+    return;
+  }
+  cont.innerHTML = pans.map((p, idx) => `
+    <div class="pan-box">
+      <div class="pan-top">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;">
+          <span class="pan-badge">PAN ${idx + 1}</span>
+          <input type="text" value="${p.nom}" onchange="majPan(${p.id}, 'nom', this.value)" style="font-weight:600;">
+        </div>
+        <button class="btn btn-danger" onclick="supprimerPan(${p.id})">✕ Retirer</button>
+      </div>
+      <div class="pan-grid">
+        <div>
+          <div class="row">
+            <div class="field">
+              <label>Forme</label>
+              <select onchange="majPan(${p.id}, 'forme', this.value)">
+                <option value="rectangle" ${p.forme==='rectangle'?'selected':''}>Rectangle ▭</option>
+                <option value="triangle_gauche" ${p.forme==='triangle_gauche'?'selected':''}>Triangle Gauche ◢</option>
+                <option value="triangle_droite" ${p.forme==='triangle_droite'?'selected':''}>Triangle Droite ◣</option>
+                <option value="croupe" ${p.forme==='croupe'?'selected':''}>Croupe ▲</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Nombre de pans</label>
+              <select onchange="majPan(${p.id}, 'qte', this.value)">
+                <option value="1" ${p.qte==1?'selected':''}>× 1 pan</option>
+                <option value="2" ${p.qte==2?'selected':''}>× 2 pans</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Longueur bas / égout (m)</label>
+              <input type="number" value="${p.longueur}" min="0" step="0.1" oninput="majPan(${p.id}, 'longueur', this.value)">
+            </div>
+            <div class="field">
+              <label>Pente / Hauteur (m)</label>
+              <input type="number" value="${p.pente}" min="0" step="0.1" oninput="majPan(${p.id}, 'pente', this.value)">
+            </div>
+          </div>
+        </div>
+        <div class="svg-preview">${genererSVG(p)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ==========================================
+   3. COUVERTURE DYNAMIQUE
+   ========================================== */
+function ajouterCouverture() {
+  couvertures.push({
+    id: Date.now() + Math.random(),
+    type: 'ardoise',
+    nom: 'Ardoise naturelle 32×22 cm',
+    dim1: 32,
+    dim2: 22,
+    pureau: 11,
+    prix: parseFloat(tarifsMemo.defArdoisePrix) || 32,
+    unitePrix: 'm2',
+    avecFixation: true,
+    prixFixation: parseFloat(tarifsMemo.defCrochetArdoisePrix) || 0.35
+  });
+  renderCouvertures();
+  calculerTout();
+}
+
+function supprimerCouverture(id) {
+  couvertures = couvertures.filter(c => c.id !== id);
+  renderCouvertures();
+  calculerTout();
+}
+
+function majCouv(id, champ, val) {
+  const c = couvertures.find(x => x.id === id);
+  if (!c) return;
+  if (champ === 'type') {
+    c.type = val;
+    if (val === 'ardoise') {
+      c.nom = 'Ardoise naturelle 32×22 cm'; c.dim1 = 32; c.dim2 = 22; c.pureau = 11;
+      c.prix = parseFloat(tarifsMemo.defArdoisePrix) || 32; c.unitePrix = 'm2';
+      c.prixFixation = parseFloat(tarifsMemo.defCrochetArdoisePrix) || 0.35;
+    } else if (val === 'tuile') {
+      c.nom = 'Tuile terre cuite (13/m²)'; c.dim1 = 42; c.dim2 = 25; c.pureau = 34;
+      c.prix = parseFloat(tarifsMemo.defTuilePrix) || 28; c.unitePrix = 'm2';
+      c.prixFixation = 0.25;
+    } else {
+      c.nom = 'Tôle bac acier 100×500 cm'; c.dim1 = 100; c.dim2 = 500; c.pureau = 0;
+      c.prix = parseFloat(tarifsMemo.defPlaquePrix) || 22; c.unitePrix = 'm2';
+      c.prixFixation = parseFloat(tarifsMemo.defTirefondPrix) || 0.45;
+    }
+    renderCouvertures();
+  } else if (champ === 'avecFixation') {
+    c.avecFixation = val;
+  } else if (champ === 'nom' || champ === 'unitePrix') {
+    c[champ] = val;
+  } else {
+    c[champ] = parseFloat(val) || 0;
+    if (champ === 'prix') {
+      if (c.type === 'ardoise') tarifsMemo.defArdoisePrix = c.prix;
+      if (c.type === 'tuile') tarifsMemo.defTuilePrix = c.prix;
+      if (c.type === 'plaque') tarifsMemo.defPlaquePrix = c.prix;
+      sauverTarifs();
+    }
+    if (champ === 'prixFixation') {
+      if (c.type === 'ardoise') tarifsMemo.defCrochetArdoisePrix = c.prixFixation;
+      if (c.type === 'plaque') tarifsMemo.defTirefondPrix = c.prixFixation;
+      sauverTarifs();
+    }
+  }
+  calculerTout();
+}
+
+function renderCouvertures() {
+  const cont = document.getElementById('listeCouvertures');
+  if (couvertures.length === 0) {
+    cont.innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); border:1px dashed var(--border); border-radius:10px;">
+      Aucune couverture ajoutée. Cliquez sur « + Ajouter une couverture ».
+    </div>`;
+    return;
+  }
+  cont.innerHTML = couvertures.map((c, idx) => {
+    const isPlaque = c.type === 'plaque';
+    const labelFix = c.type === 'ardoise' ? 'Crochets à ardoise (1/ardoise)' : (isPlaque ? 'Tirefonds + cavaliers (6/m²)' : 'Crochets / vis tuiles (4/m²)');
+    return `
+      <div class="pan-box">
+        <div class="pan-top">
+          <span class="pan-badge">COUVERTURE ${idx + 1}</span>
+          <button class="btn btn-danger" onclick="supprimerCouverture(${c.id})">✕ Retirer</button>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Type de matériau</label>
+            <select onchange="majCouv(${c.id}, 'type', this.value)">
+              <option value="ardoise" ${c.type==='ardoise'?'selected':''}>Ardoise (au nombre)</option>
+              <option value="tuile" ${c.type==='tuile'?'selected':''}>Tuile (au nombre)</option>
+              <option value="plaque" ${c.type==='plaque'?'selected':''}>Tôles / Bac acier / Plaques</option>
+            </select>
+          </div>
+          <div class="field" style="flex:2 1 200px;">
+            <label>Désignation</label>
+            <input type="text" value="${c.nom}" oninput="majCouv(${c.id}, 'nom', this.value)">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>${isPlaque ? 'Largeur utile plaque (cm)' : 'Hauteur / Long. (cm)'}</label>
+            <input type="number" value="${c.dim1}" min="1" oninput="majCouv(${c.id}, 'dim1', this.value)">
+          </div>
+          <div class="field">
+            <label>${isPlaque ? 'Longueur plaque (cm)' : 'Largeur (cm)'}</label>
+            <input type="number" value="${c.dim2}" min="1" oninput="majCouv(${c.id}, 'dim2', this.value)">
+          </div>
+          ${!isPlaque ? `<div class="field">
+            <label>Pureau (cm)</label>
+            <input type="number" value="${c.pureau}" min="1" oninput="majCouv(${c.id}, 'pureau', this.value)">
+          </div>` : ''}
+          <div class="field">
+            <label>Prix couverture (€ HT)</label>
+            <div style="display:flex;gap:4px;">
+              <input type="number" value="${c.prix}" step="0.10" oninput="majCouv(${c.id}, 'prix', this.value)">
+              <select style="width:82px;" onchange="majCouv(${c.id}, 'unitePrix', this.value)">
+                <option value="m2" ${c.unitePrix==='m2'?'selected':''}>€/m²</option>
+                <option value="u" ${c.unitePrix==='u'?'selected':''}>€/u</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:6px;padding-top:8px;border-top:1px dashed #cbd5e1;">
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.86rem;font-weight:600;cursor:pointer;">
+            <input type="checkbox" ${c.avecFixation?'checked':''} onchange="majCouv(${c.id}, 'avecFixation', this.checked)">
+            Inclure ${labelFix}
+          </label>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <span style="font-size:0.8rem;color:var(--muted);">Prix fixation (€/u) :</span>
+            <input type="number" value="${c.prixFixation}" step="0.01" style="width:85px;" oninput="majCouv(${c.id}, 'prixFixation', this.value)">
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ==========================================
+   5. MAIN D'OEUVRE EXCLUSIVE & LIGNES LIBRES
+   ========================================== */
+function setModeMO(mode) {
+  modeMO = mode;
+  document.getElementById('btnMoM2').classList.toggle('active', mode === 'm2');
+  document.getElementById('btnMoHeure').classList.toggle('active', mode === 'heure');
+  document.getElementById('zoneMoM2').style.display = (mode === 'm2') ? 'block' : 'none';
+  document.getElementById('zoneMoHeure').style.display = (mode === 'heure') ? 'block' : 'none';
+  calculerTout();
+}
+
+function setNbPersonnes(n) {
+  nbPersonnes = n;
+  document.getElementById('btnPers1').classList.toggle('active', n === 1);
+  document.getElementById('btnPers2').classList.toggle('active', n === 2);
+  calculerTout();
+}
+
+function ajouterLigneLibre() {
+  lignesLibres.push({
+    id: Date.now() + Math.random(),
+    nom: '',
+    qte: 1,
+    unite: 'u',
+    prix: 0
+  });
+  renderLibres();
+  calculerTout();
+}
+
+function supprimerLibre(id) {
+  lignesLibres = lignesLibres.filter(l => l.id !== id);
+  renderLibres();
+  calculerTout();
+}
+
+function majLibre(id, champ, val) {
+  const l = lignesLibres.find(x => x.id === id);
+  if (!l) return;
+  l[champ] = (champ === 'nom' || champ === 'unite') ? val : (parseFloat(val) || 0);
+  calculerTout();
+}
+
+function renderLibres() {
+  const cont = document.getElementById('listeLibres');
+  if (lignesLibres.length === 0) {
+    cont.innerHTML = '';
+    return;
+  }
+  cont.innerHTML = lignesLibres.map(l => `
+    <div class="pan-box" style="padding:10px;">
+      <div class="row" style="margin-bottom:0;align-items:flex-end;">
+        <div class="field" style="flex:2.5 1 200px;">
+          <label>Description (Velux, éclairage, nacelle...)</label>
+          <input type="text" placeholder="Ex : Fenêtre de toit Velux + raccord" value="${l.nom}" oninput="majLibre(${l.id}, 'nom', this.value)">
+        </div>
+        <div class="field" style="flex:0.7 1 80px;">
+          <label>Quantité</label>
+          <input type="number" value="${l.qte}" min="0" step="0.5" oninput="majLibre(${l.id}, 'qte', this.value)">
+        </div>
+        <div class="field" style="flex:0.8 1 90px;">
+          <label>Unité</label>
+          <select onchange="majLibre(${l.id}, 'unite', this.value)">
+            <option value="u" ${l.unite==='u'?'selected':''}>u</option>
+            <option value="ml" ${l.unite==='ml'?'selected':''}>ml</option>
+            <option value="m²" ${l.unite==='m²'?'selected':''}>m²</option>
+            <option value="forfait" ${l.unite==='forfait'?'selected':''}>forfait</option>
+            <option value="h" ${l.unite==='h'?'selected':''}>h</option>
+          </select>
+        </div>
+        <div class="field" style="flex:0.9 1 100px;">
+          <label>Prix U. (€ HT)</label>
+          <input type="number" value="${l.prix}" step="1" oninput="majLibre(${l.id}, 'prix', this.value)">
+        </div>
+        <button class="btn btn-danger" style="height:37px;" onclick="supprimerLibre(${l.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ==========================================
+   CALCUL GLOBAL & MISE À JOUR RÉCAPITULATIF
+   ========================================== */
+function fmt(n) {
+  return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+function calculerTout() {
+  const clientNom = document.getElementById('clientNom').value.trim();
+  const clientAdr = document.getElementById('clientAdresse').value.trim();
+  document.getElementById('recapTitreClient').textContent = clientNom ? `Client : ${clientNom}` : 'Récapitulatif & Comptage';
+  document.getElementById('recapSubClient').textContent = clientAdr || (pans.length ? `${pans.length} pan(s) de toiture saisi(s)` : 'Chantier vierge — sélectionnez vos éléments');
+
+  const marge = (parseFloat(document.getElementById('margeChutes').value) || 0) / 100;
+  const coefMarge = 1 + marge;
+  const tva = parseFloat(document.getElementById('tvaSelect').value) || 0;
+
+  // 1. Calcul géométrique des pans
+  let surfaceTot = 0;
+  let egoutTot = 0;
+  let rivesTot = 0;
+  let faitageTot = 0;
+
+  pans.forEach(p => {
+    const L = p.longueur || 0;
+    const H = p.pente || 0;
+    const q = p.qte || 1;
+    if (p.forme === 'rectangle') {
+      surfaceTot += L * H * q;
+      egoutTot += L * q;
+      rivesTot += (2 * H) * q;
+      faitageTot += (q >= 2 ? L : L);
+    } else if (p.forme === 'triangle_gauche' || p.forme === 'triangle_droite') {
+      surfaceTot += ((L * H) / 2) * q;
+      egoutTot += L * q;
+      rivesTot += (H + Math.hypot(L, H)) * q;
+    } else if (p.forme === 'croupe') {
+      surfaceTot += ((L * H) / 2) * q;
+      egoutTot += L * q;
+      rivesTot += (2 * Math.hypot(L / 2, H)) * q;
+    }
+  });
+  if (pans.some(p => p.forme === 'rectangle' && p.qte >= 2)) {
+    faitageTot = pans.filter(p => p.forme === 'rectangle').reduce((acc, p) => acc + p.longueur, 0);
+  }
+
+  document.getElementById('kpiSurface').textContent = `${Math.round(surfaceTot * 100) / 100} m²`;
+  document.getElementById('kpiEgout').textContent = `${Math.round(egoutTot * 10) / 10} ml`;
+  document.getElementById('kpiRives').textContent = `${Math.round(rivesTot * 10) / 10} ml`;
+  document.getElementById('kpiFaitage').textContent = `${Math.round(faitageTot * 10) / 10} ml`;
+
+  const lignesDevis = [];
+  const compteurs = [];
+  let totalFournituresHT = 0;
+  let totalMOHT = 0;
+
+  function addFourniture(nom, qte, unite, pu) {
+    if (qte <= 0) return;
+    const tot = qte * pu;
+    totalFournituresHT += tot;
+    lignesDevis.push({ nom, qte, unite, pu, tot });
+  }
+
+  function addMO(nom, qte, unite, pu) {
+    if (qte <= 0) return;
+    const tot = qte * pu;
+    totalMOHT += tot;
+    lignesDevis.push({ nom, qte, unite, pu, tot });
+  }
+
+  // 2. Bois & Écran
+  if (document.getElementById('chk-chevrons').checked && surfaceTot > 0) {
+    const sec = document.getElementById('chevSection').value;
+    const entM = (parseFloat(document.getElementById('chevEntraxe').value) || 60) / 100;
+    const lBarre = parseFloat(document.getElementById('chevLongBarre').value) || 5;
+    const prixML = parseFloat(document.getElementById('chevPrixML').value) || 0;
+    let mlTotal = 0;
+    pans.forEach(p => {
+      const nb = Math.ceil(p.longueur / entM) + 1;
+      const moyPente = p.forme === 'rectangle' ? p.pente : p.pente * 0.6;
+      mlTotal += nb * moyPente * p.qte;
+    });
+    const nbBarres = Math.ceil((mlTotal * coefMarge) / lBarre);
+    compteurs.push({ label: `Chevrons (${lBarre}m)`, val: `${nbBarres} barres` });
+    addFourniture(`Chevrons ${sec} (barre ${lBarre}m)`, nbBarres, 'barres', prixML * lBarre);
+  }
+
+  if (document.getElementById('chk-tasseaux').checked && surfaceTot > 0) {
+    const sec = document.getElementById('tasSection').value;
+    const ecartM = (parseFloat(document.getElementById('tasEcart').value) || 35) / 100;
+    const lBarre = parseFloat(document.getElementById('tasLongBarre').value) || 4;
+    const prixML = parseFloat(document.getElementById('tasPrixML').value) || 0;
+    const mlTotal = (surfaceTot / ecartM) * coefMarge;
+    const nbBarres = Math.ceil(mlTotal / lBarre);
+    compteurs.push({ label: `Tasseaux / Liteaux (${lBarre}m)`, val: `${nbBarres} barres` });
+    addFourniture(`Tasseaux ${sec} (barre ${lBarre}m)`, nbBarres, 'barres', prixML * lBarre);
+  }
+
+  if (document.getElementById('chk-contrelattes').checked && surfaceTot > 0) {
+    const sec = document.getElementById('clSection').value;
+    const entM = (parseFloat(document.getElementById('clEntraxe').value) || 60) / 100;
+    const lBarre = parseFloat(document.getElementById('clLongBarre').value) || 4;
+    const prixML = parseFloat(document.getElementById('clPrixML').value) || 0;
+    const mlTotal = (surfaceTot / entM) * coefMarge;
+    const nbBarres = Math.ceil(mlTotal / lBarre);
+    compteurs.push({ label: `Contre-lattes (${lBarre}m)`, val: `${nbBarres} barres` });
+    addFourniture(`Contre-lattes ${sec} (barre ${lBarre}m)`, nbBarres, 'barres', prixML * lBarre);
+  }
+
+  if (document.getElementById('chk-ecran').checked && surfaceTot > 0) {
+    const nom = document.getElementById('ecranNom').value;
+    const prixM2 = parseFloat(document.getElementById('ecranPrixM2').value) || 0;
+    const surfEcran = Math.ceil(surfaceTot * 1.10);
+    compteurs.push({ label: 'Écran sous-toiture', val: `${surfEcran} m²` });
+    addFourniture(nom, surfEcran, 'm²', prixM2);
+  }
+
+  // 3. Couvertures
+  couvertures.forEach(c => {
+    if (surfaceTot <= 0) return;
+    if (c.type === 'plaque') {
+      const largM = (c.dim1 || 100) / 100;
+      const longM = (c.dim2 || 500) / 100;
+      const surfPlaque = largM * longM;
+      const nbPlaques = Math.ceil((surfaceTot / surfPlaque) * coefMarge);
+      const pu = c.unitePrix === 'm2' ? (c.prix * surfPlaque) : c.prix;
+      compteurs.push({ label: `Plaques (${c.dim1}×${c.dim2}cm)`, val: `${nbPlaques} plaques` });
+      addFourniture(c.nom, nbPlaques, 'plaques', pu);
+      if (c.avecFixation) {
+        const nbVis = Math.ceil(surfaceTot * 6 * coefMarge);
+        compteurs.push({ label: 'Tirefonds + cavaliers', val: `${nbVis} pièces` });
+        addFourniture('Tirefonds + cavaliers étanches', nbVis, 'u', c.prixFixation);
+      }
+    } else {
+      const largM = (c.dim2 || 22) / 100;
+      const purM = (c.pureau || 11) / 100;
+      const nbParM2 = Math.ceil(1 / (largM * purM));
+      const nbPieces = Math.ceil(surfaceTot * nbParM2 * coefMarge);
+      const unite = c.type === 'ardoise' ? 'ardoises' : 'tuiles';
+      const pu = c.unitePrix === 'm2' ? (c.prix / nbParM2) : c.prix;
+      compteurs.push({ label: c.type === 'ardoise' ? 'Ardoises' : 'Tuiles', val: `${nbPieces} ${unite}` });
+      addFourniture(c.nom, nbPieces, unite, pu);
+      if (c.avecFixation) {
+        const nbFix = c.type === 'ardoise' ? nbPieces : Math.ceil(surfaceTot * 4 * coefMarge);
+        const labelFix = c.type === 'ardoise' ? 'Crochets à ardoise' : 'Crochets / vis tuiles';
+        compteurs.push({ label: labelFix, val: `${nbFix} crochets` });
+        addFourniture(labelFix, nbFix, 'u', c.prixFixation);
+      }
+    }
+  });
+
+  // 4. Gouttières & Zinguerie
+  if (document.getElementById('chk-gouttiere').checked) {
+    const ml = Math.ceil(egoutTot);
+    const nom = document.getElementById('goutNom').value;
+    const pu = parseFloat(document.getElementById('goutPrixML').value) || 0;
+    const entCm = parseFloat(document.getElementById('goutEntraxeCrochet').value) || 50;
+    const puCr = parseFloat(document.getElementById('goutPrixCrochet').value) || 0;
+    const nbNaiss = parseInt(document.getElementById('goutNbNaissances').value) || 0;
+    const puNaiss = parseFloat(document.getElementById('goutPrixNaissance').value) || 0;
+    const nbTal = parseInt(document.getElementById('goutNbTalons').value) || 0;
+    const puTal = parseFloat(document.getElementById('goutPrixTalon').value) || 0;
+
+    if (ml > 0) {
+      compteurs.push({ label: 'Gouttières', val: `${ml} ml` });
+      addFourniture(nom, ml, 'ml', pu);
+      const nbCrochets = Math.ceil((ml * 100) / entCm) + 2;
+      compteurs.push({ label: 'Crochets de gouttière', val: `${nbCrochets} crochets` });
+      addFourniture('Crochets de gouttière', nbCrochets, 'u', puCr);
+    }
+    if (nbNaiss > 0) addFourniture('Naissances / Moignons', nbNaiss, 'u', puNaiss);
+    if (nbTal > 0) addFourniture('Talons / Fonds de gouttière', nbTal, 'u', puTal);
+  }
+
+  if (document.getElementById('chk-descente').checked) {
+    const nbDesc = parseInt(document.getElementById('descNb').value) || 0;
+    const haut = parseFloat(document.getElementById('descHaut').value) || 0;
+    const mlDesc = Math.ceil(nbDesc * haut);
+    const puML = parseFloat(document.getElementById('descPrixML').value) || 0;
+    const puCol = parseFloat(document.getElementById('descPrixCollier').value) || 0;
+    const nbCoudes = parseInt(document.getElementById('descNbCoudes').value) || 0;
+    const puCoude = parseFloat(document.getElementById('descPrixCoude').value) || 0;
+
+    if (mlDesc > 0) {
+      compteurs.push({ label: 'Tuyaux de descente', val: `${mlDesc} ml` });
+      addFourniture('Tuyaux de descente', mlDesc, 'ml', puML);
+      const nbColliers = Math.ceil(mlDesc / 1.5) + nbDesc;
+      compteurs.push({ label: 'Colliers fixation mur', val: `${nbColliers} colliers` });
+      addFourniture('Colliers de fixation murale', nbColliers, 'u', puCol);
+    }
+    if (nbCoudes > 0) addFourniture('Coudes de descente', nbCoudes, 'u', puCoude);
+  }
+
+  if (document.getElementById('chk-rives').checked) {
+    const mlRive = Math.ceil(rivesTot);
+    const puRive = parseFloat(document.getElementById('rivePrixML').value) || 0;
+    if (mlRive > 0) {
+      compteurs.push({ label: 'Bandes de rive', val: `${mlRive} ml` });
+      addFourniture('Bandes de rive', mlRive, 'ml', puRive);
+    }
+    if (document.getElementById('egoActif').value === 'oui' && egoutTot > 0) {
+      const mlEgo = Math.ceil(egoutTot);
+      const puEgo = parseFloat(document.getElementById('egoPrixML').value) || 0;
+      addFourniture("Bandes d'égout", mlEgo, 'ml', puEgo);
+    }
+  }
+
+  if (document.getElementById('chk-solin').checked) {
+    const nom = document.getElementById('solinNom').value;
+    const ml = parseFloat(document.getElementById('solinML').value) || 0;
+    const pu = parseFloat(document.getElementById('solinPrixML').value) || 0;
+    addFourniture(nom, ml, 'ml', pu);
+  }
+
+  // 5. Faîtage, Main d'oeuvre & Lignes libres
+  if (document.getElementById('chk-faitage').checked) {
+    const nom = document.getElementById('faitNom').value;
+    const ml = Math.ceil(faitageTot);
+    const pu = parseFloat(document.getElementById('faitPrixML').value) || 0;
+    const nbChat = parseInt(document.getElementById('nbChatieres').value) || 0;
+    const puChat = parseFloat(document.getElementById('prixChatiere').value) || 0;
+    if (ml > 0) {
+      compteurs.push({ label: 'Faîtage + closoir', val: `${ml} ml` });
+      addFourniture(nom, ml, 'ml', pu);
+    }
+    if (nbChat > 0) addFourniture('Chatières de ventilation', nbChat, 'u', puChat);
+  }
+
+  if (document.getElementById('chk-mo').checked) {
+    if (modeMO === 'm2' && surfaceTot > 0) {
+      const puM2 = parseFloat(document.getElementById('moPrixM2').value) || 0;
+      addMO("Main-d'œuvre pose couverture", Math.round(surfaceTot * 100) / 100, 'm²', puM2);
+    } else if (modeMO === 'heure') {
+      const h = parseFloat(document.getElementById('moNbHeures').value) || 0;
+      const puH = parseFloat(document.getElementById('moPrixHeure').value) || 0;
+      const totalHeures = h * nbPersonnes;
+      const equipeTxt = nbPersonnes === 2 ? '2 pers. : Florian + Brian' : '1 pers. : Florian';
+      compteurs.push({ label: `Main-d'œuvre (${equipeTxt})`, val: `${totalHeures} h` });
+      addMO(`Main-d'œuvre (${equipeTxt})`, totalHeures, 'h', puH);
+    }
+  }
+
+  lignesLibres.forEach(l => {
+    if (l.qte > 0 && l.prix >= 0) {
+      addMO(l.nom || 'Prestation / Fourniture libre', l.qte, l.unite, l.prix);
+    }
+  });
+
+  // Affichage des compteurs
+  document.getElementById('zoneCompteurs').innerHTML = compteurs.map(c => `
+    <div class="compteur-item">
+      <span>${c.label}</span>
+      <span class="compteur-badge">${c.val}</span>
+    </div>
+  `).join('');
+
+  // Affichage tableau
+  const tbody = document.getElementById('tableBody');
+  if (lignesDevis.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:18px 0;">Aucun élément sélectionné (0,00 €)</td></tr>`;
+  } else {
+    tbody.innerHTML = lignesDevis.map(l => `
+      <tr>
+        <td>${l.nom}</td>
+        <td class="num">${l.qte} ${l.unite}</td>
+        <td class="num">${fmt(l.pu)}</td>
+        <td class="num" style="font-weight:700;">${fmt(l.tot)}</td>
+      </tr>
+    `).join('');
+  }
+
+  const totalHT = totalFournituresHT + totalMOHT;
+  const montantTVA = totalHT * (tva / 100);
+  const totalTTC = totalHT + montantTVA;
+
+  document.getElementById('totFournitures').textContent = fmt(totalFournituresHT);
+  document.getElementById('totMO').textContent = fmt(totalMOHT);
+  document.getElementById('totHT').textContent = fmt(totalHT);
+  document.getElementById('labelTVA').textContent = `TVA (${tva} %)`;
+  document.getElementById('totTVA').textContent = fmt(montantTVA);
+  document.getElementById('totTTC').textContent = fmt(totalTTC);
+
+  // Préparation texte à copier
+  dernierTexteCopie = `DEVIS TOITURES FLORIAN ET BRIAN\n` +
+    (clientNom ? `Client : ${clientNom}\n` : '') +
+    `Surface : ${Math.round(surfaceTot * 100) / 100} m² | Égout : ${Math.round(egoutTot * 10) / 10} ml | Rives : ${Math.round(rivesTot * 10) / 10} ml\n` +
+    `----------------------------------------\n` +
+    lignesDevis.map(l => `- ${l.nom} : ${l.qte} ${l.unite} × ${fmt(l.pu)} = ${fmt(l.tot)}`).join('\n') +
+    `\n----------------------------------------\nTotal HT : ${fmt(totalHT)} | Total TTC : ${fmt(totalTTC)}`;
+}
+
+function genererEtActualiser() {
+  calculerTout();
+  afficherToast("⚡ Métré et estimation actualisés !");
+}
+
+function copierListe() {
+  if (!dernierTexteCopie) return;
+  navigator.clipboard.writeText(dernierTexteCopie).then(() => {
+    afficherToast("📋 Liste copiée dans le presse-papiers !");
+  });
+}
+
+/* ==========================================
+   SAUVEGARDE SOUS & OUVERTURE DOSSIER CLIENT
+   ========================================== */
+function sauvegarderSous() {
+  const data = {
+    clientNom: document.getElementById('clientNom').value,
+    clientAdresse: document.getElementById('clientAdresse').value,
+    pans,
+    couvertures,
+    lignesLibres,
+    modeMO,
+    nbPersonnes,
+    checks: {
+      chevrons: document.getElementById('chk-chevrons').checked,
+      tasseaux: document.getElementById('chk-tasseaux').checked,
+      contrelattes: document.getElementById('chk-contrelattes').checked,
+      ecran: document.getElementById('chk-ecran').checked,
+      gouttiere: document.getElementById('chk-gouttiere').checked,
+      descente: document.getElementById('chk-descente').checked,
+      rives: document.getElementById('chk-rives').checked,
+      solin: document.getElementById('chk-solin').checked,
+      faitage: document.getElementById('chk-faitage').checked,
+      mo: document.getElementById('chk-mo').checked
+    },
+    tarifsMemo
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  const nomFichier = (data.clientNom || 'Chantier_Vierges').replace(/[^a-zA-Z0-9_-]/g, '_');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Devis_Florian_Brian_${nomFichier}.json`;
+  a.click();
+  afficherToast("💾 Fichier client sauvegardé !");
+}
+
+function ouvrirDossier(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const data = JSON.parse(evt.target.result);
+      document.getElementById('clientNom').value = data.clientNom || '';
+      document.getElementById('clientAdresse').value = data.clientAdresse || '';
+      pans = data.pans || [];
+      couvertures = data.couvertures || [];
+      lignesLibres = data.lignesLibres || [];
+      if (data.modeMO) setModeMO(data.modeMO);
+      if (data.nbPersonnes) setNbPersonnes(data.nbPersonnes);
+      if (data.checks) {
+        Object.keys(data.checks).forEach(k => {
+          const el = document.getElementById('chk-' + k);
+          if (el) {
+            el.checked = data.checks[k];
+            document.getElementById('blk-' + k).classList.toggle('checked', data.checks[k]);
+          }
+        });
+      }
+      renderPans();
+      renderCouvertures();
+      renderLibres();
+      calculerTout();
+      afficherToast("📂 Dossier client chargé !");
+    } catch (err) {
+      alert("Fichier invalide.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function nouveauChantierVierge() {
+  pans = [];
+  couvertures = [];
+  lignesLibres = [];
+  document.getElementById('clientNom').value = '';
+  document.getElementById('clientAdresse').value = '';
+  ['chevrons','tasseaux','contrelattes','ecran','gouttiere','descente','rives','solin','faitage','mo'].forEach(k => {
+    const el = document.getElementById('chk-' + k);
+    if (el) {
+      el.checked = false;
+      document.getElementById('blk-' + k).classList.remove('checked');
+    }
+  });
+  setModeMO('m2');
+  setNbPersonnes(1);
+  renderPans();
+  renderCouvertures();
+  renderLibres();
+  calculerTout();
+  afficherToast("🗑️ Nouveau chantier vierge prêt");
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  chargerTarifs();
+  nouveauChantierVierge();
+});
+</script>
+</body>
+</html>
