@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Devis Toitures Jean-Luc et Florian — Aide au métré &amp; chiffrage estimatif</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+    .tab-btn.active {
+      background-color: #0f172a;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.22);
+    }
+    .fade-in {
+      animation: fadeIn 0.16s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media print {
+      @page { size: A4; margin: 10mm; }
+      body { background: #ffffff !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      .print-full {
+        width: 100% !important;
+        max-width: 100% !important;
+        grid-column: span 12 / span 12 !important;
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        position: static !important;
+      }
+      .print-dark-reset {
+        background: #f8fafc !important;
+        color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- =====================================================================
+       EN-TÊTE PRINCIPAL
+       ===================================================================== -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30 no-print">
+    <div class="max-w-[1640px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="bg-orange-600 text-white p-2.5 rounded-xl shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight leading-tight text-white">
+            Devis Toitures Jean-Luc et Florian
+          </h1>
+          <p class="text-xs text-slate-300 font-medium">
+            Assistant rapide de métré, comptage matériaux &amp; estimation HT/TTC
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <span id="toastBadge" class="hidden text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-lg font-bold">
+          ✓ Calcul mis à jour !
+        </span>
+
+        <button type="button" id="btnGenerer" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-extrabold transition shadow flex items-center gap-1.5">
+          ⚡ Générer / Actualiser
+        </button>
+
+        <button type="button" id="btnSauvegarderSous" class="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold transition shadow flex items-center gap-1.5">
+          💾 Sauvegarder sous...
+        </button>
+
+        <label class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs sm:text-sm font-semibold transition border border-slate-700 flex items-center gap-1.5 cursor-pointer">
+          📂 Ouvrir dossier
+          <input type="file" id="inputOuvrirDossier" accept=".json" class="hidden">
+        </label>
+
+        <button type="button" id="btnNouveauChantier" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-rose-600 text-slate-200 hover:text-white text-xs sm:text-sm font-semibold transition border border-slate-700 flex items-center gap-1.5">
+          🔄 Réinitialiser
+        </button>
+
+        <button type="button" id="btnImprimer" class="px-3.5 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs sm:text-sm font-bold transition shadow flex items-center gap-1.5">
+          🖨️ Imprimer fiche
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       BARRE CLIENT & TVA
+       ===================================================================== -->
+  <div class="bg-white border-b border-slate-200 shadow-sm no-print">
+    <div class="max-w-[1640px] mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+      <span class="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-lg text-xs font-extrabold whitespace-nowrap">
+        👤 Futur devis client
+      </span>
+      <div class="flex-1 min-w-[220px]">
+        <input type="text" id="clientNom" placeholder="Nom &amp; Prénom du client / Chantier (Ex : M. Dupont Jean)" class="w-full px-3.5 py-2 border-2 border-blue-200 focus:border-blue-600 focus:outline-none rounded-xl text-sm font-bold text-slate-900 bg-blue-50/40">
+      </div>
+      <div class="flex-1 min-w-[220px]">
+        <input type="text" id="clientAdresse" placeholder="Adresse / Notes chantier (Ex : 12 rue des Tilleuls, Vervins)" class="w-full px-3.5 py-2 border border-slate-300 focus:border-blue-600 focus:outline-none rounded-xl text-sm font-medium text-slate-700 bg-slate-50">
+      </div>
+      <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+        <label for="tauxTva" class="text-xs font-extrabold text-slate-700 whitespace-nowrap">TVA :</label>
+        <select id="tauxTva" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-extrabold text-slate-900">
+          <option value="0">0 %</option>
+          <option value="5.5">5,5 %</option>
+          <option value="10" selected>10 % (Rénov.)</option>
+          <option value="20">20 % (Neuf)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- EN-TÊTE SPÉCIAL IMPRESSION -->
+  <div class="hidden print-only p-4 border-b-2 border-slate-800 mb-4">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-xl font-extrabold text-slate-900">Devis Toitures Jean-Luc et Florian — Fiche Métré &amp; Estimation</h1>
+        <p class="text-sm font-bold text-blue-800 mt-1" id="printClientInfo">Client : Non renseigné</p>
+        <p class="text-xs text-slate-600" id="printAdresseInfo"></p>
+      </div>
+      <div class="text-right text-xs text-slate-500" id="printDateInfo"></div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       ZONE PRINCIPALE EN 2 COLONNES
+       ===================================================================== -->
+  <main class="flex-1 max-w-[1640px] w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- ===================================================================
+         COLONNE GAUCHE : 5 ONGLETS DE SAISIE (6 COLONNES)
+         =================================================================== -->
+    <div class="lg:col-span-6 space-y-4 no-print">
+
+      <!-- NAVIGATION PAR ONGLETS -->
+      <nav class="bg-white p-1.5 rounded-xl shadow-sm border border-slate-200 grid grid-cols-2 sm:grid-cols-5 gap-1">
+        <button type="button" data-tab="tab-pans" class="tab-btn active py-2.5 px-2 rounded-lg text-xs font-bold transition text-center">
+          1. Pans &amp; Schémas
+        </button>
+        <button type="button" data-tab="tab-bois" class="tab-btn py-2.5 px-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition text-center">
+          2. Bois &amp; Écran
+        </button>
+        <button type="button" data-tab="tab-couverture" class="tab-btn py-2.5 px-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition text-center">
+          3. Couverture &amp; Fix.
+        </button>
+        <button type="button" data-tab="tab-zinguerie" class="tab-btn py-2.5 px-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition text-center">
+          4. Gouttières &amp; Zinc
+        </button>
+        <button type="button" data-tab="tab-faitage" class="tab-btn col-span-2 sm:col-span-1 py-2.5 px-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-100 transition text-center">
+          5. Faîtage &amp; M.O.
+        </button>
+      </nav>
+
+      <!-- ===============================================================
+           ONGLET 1 : PANS & SCHÉMAS SVG
+           =============================================================== -->
+      <section id="tab-pans" class="tab-panel fade-in space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold text-slate-800">1. Géométrie des pans de toiture</h2>
+              <p class="text-xs text-slate-500">Ajoutez vos pans rectangles et vos morceaux en triangle (gauche, droite ou croupe).</p>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" data-add-pan="rect" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                + Rectangle
+              </button>
+              <button type="button" data-add-pan="tri_left" class="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                + Triangle Gauche ◢
+              </button>
+              <button type="button" data-add-pan="tri_right" class="px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                + Triangle Droite ◣
+              </button>
+              <button type="button" data-add-pan="croupe" class="px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                + Croupe ▲
+              </button>
+            </div>
+          </div>
+
+          <div id="pansContainer" class="space-y-3"></div>
+
+          <div id="triangleTipBox" class="hidden mt-4 bg-orange-50 border-l-4 border-orange-500 p-3 rounded-r-lg text-xs text-orange-900">
+            <strong>💡 Astuce découpe triangle :</strong> Vous avez un ou plusieurs morceaux en triangle. Une marge de sécurité de <strong>10 à 15 %</strong> est recommandée pour les coupes en biais.
+          </div>
+
+          <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3.5 rounded-xl">
+            <div>
+              <label for="margePertes" class="block text-xs font-extrabold text-slate-800">Marge de sécurité / pertes de coupe (%)</label>
+              <span class="text-[11px] text-slate-500">Appliquée automatiquement sur les ardoises, tuiles, tôles et l'écran sous-toiture.</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="number" id="margePertes" value="8" min="0" max="50" step="1" class="w-20 px-3 py-2 border border-slate-300 rounded-lg text-sm font-extrabold text-right bg-white">
+              <span class="text-sm font-bold text-slate-700">%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           ONGLET 2 : BOIS & ÉCRAN
+           =============================================================== -->
+      <section id="tab-bois" class="tab-panel hidden fade-in space-y-4">
+        <!-- CHEVRONS -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-3">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="useChevrons" checked class="w-4 h-4 text-blue-600 rounded">
+              <span class="text-base font-extrabold text-slate-800">Chevrons (Charpente)</span>
+            </label>
+            <span id="badgeChevrons" class="text-xs font-extrabold px-3 py-1 bg-orange-100 text-orange-900 rounded-full">0 barres</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Entraxe (cm)</label>
+              <input type="number" id="ecartChevron" value="60" min="20" step="5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Section (mm)</label>
+              <div class="flex items-center gap-1">
+                <input type="number" id="chevronEp" value="60" min="10" class="w-full px-1.5 py-2 border border-slate-300 rounded-lg text-sm text-center font-semibold">
+                <span class="text-xs text-slate-400">×</span>
+                <input type="number" id="chevronLarg" value="80" min="10" class="w-full px-1.5 py-2 border border-slate-300 rounded-lg text-sm text-center font-semibold">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Longueur barre (m)</label>
+              <input type="number" id="longChevron" value="5" min="1" step="0.5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix (€ / ml)</label>
+              <input type="number" id="prixChevronML" value="4.50" min="0" step="0.05" class="w-full px-2.5 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+          <div class="mt-2.5 flex justify-between text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
+            <span>Total linéaire : <strong id="mlChevronsInfo">0 ml</strong></span>
+            <span>Soit : <strong id="prixBarreChevronInfo" class="text-blue-700">0,00 € / barre</strong></span>
+          </div>
+        </div>
+
+        <!-- TASSEAUX / LITEAUX -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-3">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="useTasseaux" checked class="w-4 h-4 text-blue-600 rounded">
+              <span class="text-base font-extrabold text-slate-800">Tasseaux / Liteaux (horizontaux)</span>
+            </label>
+            <span id="badgeTasseaux" class="text-xs font-extrabold px-3 py-1 bg-orange-100 text-orange-900 rounded-full">0 barres</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Écartement / Pureau (cm)</label>
+              <input type="number" id="ecartTasseau" value="30" min="5" step="1" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Section (mm)</label>
+              <div class="flex items-center gap-1">
+                <input type="number" id="tasseauEp" value="27" min="5" class="w-full px-1.5 py-2 border border-slate-300 rounded-lg text-sm text-center font-semibold">
+                <span class="text-xs text-slate-400">×</span>
+                <input type="number" id="tasseauLarg" value="40" min="5" class="w-full px-1.5 py-2 border border-slate-300 rounded-lg text-sm text-center font-semibold">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Longueur barre (m)</label>
+              <input type="number" id="longTasseau" value="4" min="1" step="0.5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix (€ / ml)</label>
+              <input type="number" id="prixTasseauML" value="1.45" min="0" step="0.05" class="w-full px-2.5 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+          <div class="mt-2.5 flex justify-between text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
+            <span>Total linéaire : <strong id="mlTasseauxInfo">0 ml</strong></span>
+            <span>Soit : <strong id="prixBarreTasseauInfo" class="text-blue-700">0,00 € / barre</strong></span>
+          </div>
+        </div>
+
+        <!-- CONTRE-LATTES -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-3">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="useContreLattes" checked class="w-4 h-4 text-blue-600 rounded">
+              <div>
+                <span class="text-base font-extrabold text-slate-800 block">Contre-lattes (sur chevrons)</span>
+                <span class="text-xs text-slate-500">Maintien de l'écran sous-toiture et lame d'air</span>
+              </div>
+            </label>
+            <span id="badgeContreLattes" class="text-xs font-extrabold px-3 py-1 bg-orange-100 text-orange-900 rounded-full">0 barres</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Entraxe (cm)</label>
+              <input type="number" id="ecartContreLatte" value="60" min="20" step="5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Section (mm)</label>
+              <div class="flex items-center gap-1">
+                <input type="number" id="contreLatteEp" value="20" min="5" class="w-full px-1.5 py-2 border border-slate-300 rounded-lg text-sm text-center font-semibold">
+                <span class="text-xs text-slate-400">×</span>
+                <input type="number" id="contreLatteLarg" value="40" min="5" class="w-full px-1.5 py-2 border border-slate-300 rounded-lg text-sm text-center font-semibold">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Longueur barre (m)</label>
+              <input type="number" id="longContreLatte" value="4" min="1" step="0.5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix (€ / ml)</label>
+              <input type="number" id="prixContreLatteML" value="1.15" min="0" step="0.05" class="w-full px-2.5 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+          <div class="mt-2.5 flex justify-between text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg">
+            <span>Total linéaire : <strong id="mlContreLattesInfo">0 ml</strong></span>
+            <span>Soit : <strong id="prixBarreContreLatteInfo" class="text-blue-700">0,00 € / barre</strong></span>
+          </div>
+        </div>
+
+        <!-- ÉCRAN SOUS-TOITURE -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-3">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="useEcran" checked class="w-4 h-4 text-blue-600 rounded">
+              <div>
+                <span class="text-base font-extrabold text-slate-800 block">Écran sous-toiture HPV</span>
+                <span class="text-xs text-slate-500">Avec recouvrement des lés</span>
+              </div>
+            </label>
+            <span id="badgeEcran" class="text-xs font-extrabold px-3 py-1 bg-blue-100 text-blue-900 rounded-full">0 m²</span>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Recouvrement (%)</label>
+              <input type="number" id="ecranRecouvrement" value="10" min="0" max="30" step="1" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Rouleau (m²)</label>
+              <input type="number" id="ecranRouleauM2" value="75" min="10" step="5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix (€ / m²)</label>
+              <input type="number" id="prixEcranM2" value="3.80" min="0" step="0.10" class="w-full px-2.5 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           ONGLET 3 : COUVERTURE & FIXATIONS
+           =============================================================== -->
+      <section id="tab-couverture" class="tab-panel hidden fade-in space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-4">
+            <div>
+              <h2 class="text-base sm:text-lg font-extrabold text-slate-800">3. Matériaux de couverture</h2>
+              <p class="text-xs text-slate-500">Ardoises, tuiles, tôles bac acier ou couverture au m².</p>
+            </div>
+            <button type="button" id="btnAddCouverture" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+              + Ajouter une couverture
+            </button>
+          </div>
+          <div id="couverturesContainer" class="space-y-3"></div>
+        </div>
+
+        <!-- FIXATIONS & CROCHETS -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-3">
+          <h3 class="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-2">Fixations &amp; Crochets de couverture</h3>
+
+          <!-- Crochets d'ardoise (auto si ardoise) -->
+          <div id="rowCrochetsArdoise" class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div class="flex-1 min-w-[200px]">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="useCrochetsArdoise" checked class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-sm font-extrabold text-slate-800">Crochets à ardoise inox</span>
+              </label>
+              <span class="text-xs text-slate-500 block mt-0.5">Auto : 1 crochet par ardoise + 5% réserve (<strong id="badgeCrochetsArdoise">0 u</strong>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="prixCrochetArdoise" value="0.28" min="0" step="0.01" class="w-24 px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-white">
+              <span class="text-xs font-bold text-slate-600">€ / u</span>
+            </div>
+          </div>
+
+          <!-- Tirefonds & cavaliers (auto si tôles/plaques) -->
+          <div id="rowTirefonds" class="hidden flex flex-wrap items-center justify-between gap-3 bg-amber-50 p-3 rounded-xl border border-amber-200">
+            <div class="flex-1 min-w-[200px]">
+              <span class="text-sm font-extrabold text-amber-950 block">Tirefonds / Vis autoperceuses + cavaliers</span>
+              <span class="text-xs text-amber-800 block mt-0.5">Fixation tôles / bac acier (~6 fixations/m² → <strong id="badgeTirefonds">0 u</strong>)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="prixTirefond" value="0.45" min="0" step="0.01" class="w-24 px-2.5 py-1.5 border-2 border-amber-300 rounded-lg text-sm font-extrabold text-right bg-white">
+              <span class="text-xs font-bold text-amber-900">€ / u</span>
+            </div>
+          </div>
+
+          <!-- Pointes / Vis charpente & liteaux -->
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div class="flex-1 min-w-[200px]">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="usePointes" checked class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-sm font-bold text-slate-800">Pointes / Vis de liteaunage &amp; charpente</span>
+              </label>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="text-xs text-slate-500">Estimation :</span>
+                <input type="number" id="ratioPointes" value="15" min="1" step="1" class="w-16 px-2 py-0.5 border border-slate-300 rounded text-xs text-right font-bold bg-white">
+                <span class="text-xs text-slate-500">pièces / m²</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <input type="number" id="prixPointe" value="0.08" min="0" step="0.01" class="w-24 px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-white">
+              <span class="text-xs font-bold text-slate-600">€ / u</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           ONGLET 4 : GOUTTIÈRES & ZINGUERIE
+           =============================================================== -->
+      <section id="tab-zinguerie" class="tab-panel hidden fade-in space-y-4">
+        <!-- GOUTTIÈRES & CROCHETS -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="useGouttiere" checked class="w-4 h-4 text-blue-600 rounded">
+              <span class="text-base font-extrabold text-slate-800">Gouttières &amp; Crochets de gouttière</span>
+            </label>
+            <span id="badgeCrochetsGouttiere" class="text-xs font-extrabold px-3 py-1 bg-blue-100 text-blue-900 rounded-full">0 crochets</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Linéaire gouttières (ml)</label>
+              <div class="flex gap-1">
+                <input type="number" id="longGouttiere" value="20" min="0" step="0.5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-bold">
+                <button type="button" id="btnAutoGouttiere" title="Reprendre l'égout des pans cochés" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold text-slate-700">Auto</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix gouttière (€ / ml)</label>
+              <input type="number" id="prixGouttiereML" value="18.00" min="0" step="0.50" class="w-full px-2.5 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Entraxe crochets (cm)</label>
+              <input type="number" id="entraxeCrochetsGouttiere" value="50" min="20" step="5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix crochet goutt. (€/u)</label>
+              <input type="number" id="prixCrochetGouttiere" value="3.20" min="0" step="0.10" class="w-full px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Naissances / Talons (u)</label>
+              <input type="number" id="qteAccessoiresGouttiere" value="4" min="0" step="1" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix accessoire (€ / u)</label>
+              <input type="number" id="prixAccessoireGouttiere" value="9.50" min="0" step="0.50" class="w-full px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+        </div>
+
+        <!-- TUYAUX DE DESCENTE & COLLIERS DE FIXATION MURALE -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <label class="flex items-center gap-2.5 cursor-pointer">
+              <input type="checkbox" id="useDescente" checked class="w-4 h-4 text-blue-600 rounded">
+              <span class="text-base font-extrabold text-slate-800">Tuyaux de descente &amp; Colliers muraux</span>
+            </label>
+            <span id="badgeColliersMur" class="text-xs font-extrabold px-3 py-1 bg-blue-100 text-blue-900 rounded-full">0 colliers</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre de descentes</label>
+              <input type="number" id="nbDescentes" value="2" min="0" step="1" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Hauteur / descente (m)</label>
+              <input type="number" id="hauteurDescente" value="3" min="0.5" step="0.5" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix tuyau (€ / ml)</label>
+              <input type="number" id="prixDescenteML" value="14.50" min="0" step="0.50" class="w-full px-2.5 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Entraxe colliers (m)</label>
+              <input type="number" id="entraxeColliers" value="1.5" min="0.5" step="0.5" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix collier (€ / u)</label>
+              <input type="number" id="prixCollierMur" value="4.20" min="0" step="0.10" class="w-full px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Coudes total (u)</label>
+              <input type="number" id="qteCoudes" value="6" min="0" step="1" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix coude (€ / u)</label>
+              <input type="number" id="prixCoude" value="8.50" min="0" step="0.50" class="w-full px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+        </div>
+
+        <!-- BANDES DE RIVE & BANDES D'ÉGOUT -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-3">
+          <h3 class="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-2">Façonnés Zinc / Alu : Rives &amp; Égouts</h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="useRives" checked class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-xs font-extrabold text-slate-800">Bandes de rive</span>
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500">Longueur (ml)</label>
+                  <div class="flex gap-1">
+                    <input type="number" id="longRives" value="10" min="0" step="0.5" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-bold bg-white">
+                    <button type="button" id="btnAutoRives" class="px-1.5 py-1 bg-slate-200 rounded text-[10px] font-bold">Auto</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-blue-700">Prix (€ / ml)</label>
+                  <input type="number" id="prixRiveML" value="16.00" min="0" step="0.50" class="w-full px-2 py-1 border border-blue-200 rounded text-xs font-extrabold text-right bg-white">
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="useBandesEgout" checked class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-xs font-extrabold text-slate-800">Bandes d'égout / Larmiers</span>
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500">Longueur (ml)</label>
+                  <div class="flex gap-1">
+                    <input type="number" id="longBandesEgout" value="20" min="0" step="0.5" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-bold bg-white">
+                    <button type="button" id="btnAutoEgout" class="px-1.5 py-1 bg-slate-200 rounded text-[10px] font-bold">Auto</button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-blue-700">Prix (€ / ml)</label>
+                  <input type="number" id="prixBandeEgoutML" value="11.00" min="0" step="0.50" class="w-full px-2 py-1 border border-blue-200 rounded text-xs font-extrabold text-right bg-white">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           ONGLET 5 : FAÎTAGE, VENTILATION & MAIN-D'ŒUVRE
+           =============================================================== -->
+      <section id="tab-faitage" class="tab-panel hidden fade-in space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-3">
+          <h2 class="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-2">Faîtage, Closoir, Chatières &amp; Solins</h2>
+
+          <!-- Faîtières -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end bg-slate-50 p-3 rounded-xl">
+            <div class="sm:col-span-1">
+              <label class="flex items-center gap-2 cursor-pointer mb-1.5">
+                <input type="checkbox" id="useFaitiere" checked class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-xs font-extrabold text-slate-800">Faîtières / Arêtiers</span>
+              </label>
+              <div class="flex gap-1">
+                <input type="number" id="longFaitiere" value="10" min="0" step="0.5" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-bold bg-white">
+                <button type="button" id="btnAutoFaitiere" class="px-2 py-1.5 bg-slate-200 rounded-lg text-xs font-bold">Auto</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-blue-700 mb-1">Prix faîtière (€ / ml)</label>
+              <input type="number" id="prixFaitiereML" value="22.00" min="0" step="0.50" class="w-full px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-white">
+            </div>
+            <div>
+              <label class="flex items-center gap-2 cursor-pointer mb-1">
+                <input type="checkbox" id="useClosoir" checked class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-xs font-bold text-slate-800">Closoir ventilé (€/ml)</span>
+              </label>
+              <input type="number" id="prixClosoirML" value="8.50" min="0" step="0.50" class="w-full px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-white">
+            </div>
+          </div>
+
+          <!-- Chatières & Solins -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="useChatieres" checked class="w-4 h-4 text-blue-600 rounded">
+                  <span class="text-xs font-extrabold text-slate-800">Chatières ventilation</span>
+                </label>
+                <button type="button" id="btnAutoChatieres" class="px-2 py-0.5 bg-slate-200 rounded text-[10px] font-bold">Auto (1/20m²)</button>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500">Quantité (u)</label>
+                  <input type="number" id="qteChatieres" value="5" min="0" step="1" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-bold bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-blue-700">Prix (€ / u)</label>
+                  <input type="number" id="prixChatiere" value="18.00" min="0" step="0.50" class="w-full px-2 py-1 border border-blue-200 rounded text-xs font-extrabold text-right bg-white">
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" id="useSolins" class="w-4 h-4 text-blue-600 rounded">
+                <span class="text-xs font-extrabold text-slate-800">Solins / Porte-solins mur</span>
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500">Longueur (ml)</label>
+                  <input type="number" id="longSolins" value="6" min="0" step="0.5" class="w-full px-2 py-1 border border-slate-300 rounded text-xs font-bold bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-blue-700">Prix (€ / ml)</label>
+                  <input type="number" id="prixSolinML" value="19.00" min="0" step="0.50" class="w-full px-2 py-1 border border-blue-200 rounded text-xs font-extrabold text-right bg-white">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN-D'ŒUVRE & FRAIS CHANTIER -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-3">
+          <h3 class="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-2">Main-d'œuvre &amp; Frais de chantier</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-blue-700 mb-1">Main-d'œuvre pose / dépose (€ / m²)</label>
+              <input type="number" id="prixMainOeuvreM2" value="35.00" min="0" step="1" class="w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-blue-700 mb-1">Forfait échafaudage / benne / divers (€ HT)</label>
+              <input type="number" id="forfaitDiversHT" value="450.00" min="0" step="10" class="w-full px-3 py-2 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-blue-50/30">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ===================================================================
+         COLONNE DROITE : RÉCAPITULATIF QUANTITÉS & ESTIMATION CHIFFRÉE
+         =================================================================== -->
+    <div id="summaryPanel" class="lg:col-span-6 lg:sticky lg:top-20 space-y-4 print-full transition-all duration-200">
+      <div class="bg-slate-900 text-white rounded-2xl shadow-xl p-4 sm:p-5 border border-slate-800 print-dark-reset">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700 pb-3 mb-4">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-orange-400 block">
+              AIDE AU DEVIS — TOITURES JEAN-LUC ET FLORIAN
+            </span>
+            <h2 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
+              📊 Métré &amp; Chiffrage Estimatif
+            </h2>
+            <div class="text-xs font-bold text-blue-300 mt-1" id="recapClientBadge">
+              Client : Non renseigné
+            </div>
+          </div>
+          <button type="button" id="btnCopierListe" class="no-print px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-extrabold transition shadow flex items-center gap-1.5">
+            📋 Copier le récapitulatif complet
+          </button>
+        </div>
+
+        <!-- 4 COMPTEURS SYNTHÈSE -->
+        <div id="kpiGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4"></div>
+
+        <!-- TABLEAU DÉTAILLÉ DES POSTES ACTIFS -->
+        <div class="bg-slate-800/80 border border-slate-700 rounded-xl overflow-hidden mb-4 print-dark-reset">
+          <div class="overflow-x-auto max-h-[430px] overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-950/70 text-slate-300 sticky top-0 print-dark-reset">
+                <tr>
+                  <th class="py-2.5 px-3 font-bold">Désignation &amp; Détail métré</th>
+                  <th class="py-2.5 px-2 text-right font-bold whitespace-nowrap">Qté</th>
+                  <th class="py-2.5 px-2 text-right font-bold whitespace-nowrap">P.U. HT</th>
+                  <th class="py-2.5 px-3 text-right font-bold whitespace-nowrap">Total HT</th>
+                </tr>
+              </thead>
+              <tbody id="recapTableBody" class="divide-y divide-slate-700/70"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ENCADRÉ FINAL DES TOTAUX HT / TVA / TTC -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 space-y-1.5 text-xs sm:text-sm print-dark-reset">
+          <div class="flex justify-between text-slate-300">
+            <span>Total Fournitures HT :</span>
+            <strong id="totalFournituresHT" class="text-white print-dark-reset">0,00 €</strong>
+          </div>
+          <div class="flex justify-between text-slate-300">
+            <span>Total Main-d'œuvre &amp; Frais HT :</span>
+            <strong id="totalMoHT" class="text-white print-dark-reset">0,00 €</strong>
+          </div>
+          <div class="flex justify-between text-slate-200 pt-1.5 border-t border-slate-700 font-bold">
+            <span>Total Général HT :</span>
+            <span id="totalGeneralHT">0,00 €</span>
+          </div>
+          <div class="flex justify-between text-slate-400 text-xs">
+            <span id="labelMontantTVA">TVA (10 %) :</span>
+            <span id="montantTVA">0,00 €</span>
+          </div>
+          <div class="flex justify-between items-center pt-2 border-t border-slate-600">
+            <span class="text-sm sm:text-base font-extrabold text-orange-400">TOTAL ESTIMATIF TTC :</span>
+            <span id="totalGeneralTTC" class="text-lg sm:text-xl font-extrabold text-white print-dark-reset">0,00 €</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODALE DE CONFIRMATION RÉINITIALISATION -->
+  <div id="modalConfirmReset" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 fade-in border border-slate-200">
+      <h3 class="text-lg font-extrabold text-slate-900 mb-2">Réinitialiser le chantier ?</h3>
+      <p class="text-sm text-slate-600 mb-5">Toutes les mesures et prix saisis seront remis aux valeurs par défaut.</p>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="btnCancelReset" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-bold">Annuler</button>
+        <button type="button" id="btnConfirmReset" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold">Oui, réinitialiser</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var STORAGE_KEY = 'devis_toitures_jl_florian_v3';
+      var nextPanId = 2;
+      var nextCouvId = 2;
+      var latestRowsForCopy = [];
+      var latestTotalsForCopy = {};
+
+      var state = {
+        clientNom: '',
+        clientAdresse: '',
+        tauxTva: 10,
+        margePertes: 8,
+        pans: [
+          { id: 1, label: 'Toiture principale', type: 'rect', L: 10, H: 5, qty: 2, hasGouttiere: true, hasRive: true }
+        ],
+        // Onglet 2 : Bois & Écran
+        useChevrons: true,
+        ecartChevron: 60,
+        chevronEp: 60,
+        chevronLarg: 80,
+        longChevron: 5,
+        prixChevronML: 4.50,
+        useTasseaux: true,
+        ecartTasseau: 30,
+        tasseauEp: 27,
+        tasseauLarg: 40,
+        longTasseau: 4,
+        prixTasseauML: 1.45,
+        useContreLattes: true,
+        ecartContreLatte: 60,
+        contreLatteEp: 20,
+        contreLatteLarg: 40,
+        longContreLatte: 4,
+        prixContreLatteML: 1.15,
+        useEcran: true,
+        ecranRecouvrement: 10,
+        ecranRouleauM2: 75,
+        prixEcranM2: 3.80,
+        // Onglet 3 : Couverture & Fixations
+        couvertures: [
+          { id: 1, label: 'Ardoise naturelle 32×22', mode: 'ardoise', dim1: 32, dim2: 22, prix: 32.00, typePrix: 'm2' }
+        ],
+        useCrochetsArdoise: true,
+        prixCrochetArdoise: 0.28,
+        prixTirefond: 0.45,
+        usePointes: true,
+        ratioPointes: 15,
+        prixPointe: 0.08,
+        // Onglet 4 : Gouttières & Zinguerie
+        useGouttiere: true,
+        autoGouttiere: true,
+        longGouttiere: 20,
+        prixGouttiereML: 18.00,
+        entraxeCrochetsGouttiere: 50,
+        prixCrochetGouttiere: 3.20,
+        qteAccessoiresGouttiere: 4,
+        prixAccessoireGouttiere: 9.50,
+        useDescente: true,
+        nbDescentes: 2,
+        hauteurDescente: 3,
+        prixDescenteML: 14.50,
+        entraxeColliers: 1.5,
+        prixCollierMur: 4.20,
+        qteCoudes: 6,
+        prixCoude: 8.50,
+        useRives: true,
+        autoRives: true,
+        longRives: 20,
+        prixRiveML: 16.00,
+        useBandesEgout: true,
+        autoBandesEgout: true,
+        longBandesEgout: 20,
+        prixBandeEgoutML: 11.00,
+        // Onglet 5 : Faîtage, Ventilation & M.O.
+        useFaitiere: true,
+        autoFaitiere: true,
+        longFaitiere: 10,
+        prixFaitiereML: 22.00,
+        useClosoir: true,
+        prixClosoirML: 8.50,
+        useChatieres: true,
+        autoChatieres: true,
+        qteChatieres: 5,
+        prixChatiere: 18.00,
+        useSolins: false,
+        longSolins: 6,
+        prixSolinML: 19.00,
+        prixMainOeuvreM2: 35.00,
+        forfaitDiversHT: 450.00
+      };
+
+      /* =====================================================================
+         UTILITAIRES
+         ===================================================================== */
+      function round1(n) {
+        return Math.round((Number(n) || 0) * 10) / 10;
+      }
+
+      function round2(n) {
+        return Math.round((Number(n) || 0) * 100) / 100;
+      }
+
+      function formatEuro(n) {
+        return (Number(n) || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function saveToLocalStorage() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      function loadFromLocalStorage() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.pans) && Array.isArray(parsed.couvertures)) {
+              state = Object.assign({}, state, parsed);
+              nextPanId = state.pans.reduce(function (m, p) { return Math.max(m, p.id); }, 0) + 1;
+              nextCouvId = state.couvertures.reduce(function (m, c) { return Math.max(m, c.id); }, 0) + 1;
+            }
+          }
+        } catch (e) {}
+      }
+
+      /* =====================================================================
+         SYNCHRONISATION DES CHAMPS STATIQUES
+         ===================================================================== */
+      var STATIC_FIELDS = [
+        'clientNom', 'clientAdresse', 'tauxTva', 'margePertes',
+        'useChevrons', 'ecartChevron', 'chevronEp', 'chevronLarg', 'longChevron', 'prixChevronML',
+        'useTasseaux', 'ecartTasseau', 'tasseauEp', 'tasseauLarg', 'longTasseau', 'prixTasseauML',
+        'useContreLattes', 'ecartContreLatte', 'contreLatteEp', 'contreLatteLarg', 'longContreLatte', 'prixContreLatteML',
+        'useEcran', 'ecranRecouvrement', 'ecranRouleauM2', 'prixEcranM2',
+        'useCrochetsArdoise', 'prixCrochetArdoise', 'prixTirefond', 'usePointes', 'ratioPointes', 'prixPointe',
+        'useGouttiere', 'longGouttiere', 'prixGouttiereML', 'entraxeCrochetsGouttiere', 'prixCrochetGouttiere',
+        'qteAccessoiresGouttiere', 'prixAccessoireGouttiere',
+        'useDescente', 'nbDescentes', 'hauteurDescente', 'prixDescenteML', 'entraxeColliers', 'prixCollierMur',
+        'qteCoudes', 'prixCoude',
+        'useRives', 'longRives', 'prixRiveML',
+        'useBandesEgout', 'longBandesEgout', 'prixBandeEgoutML',
+        'useFaitiere', 'longFaitiere', 'prixFaitiereML', 'useClosoir', 'prixClosoirML',
+        'useChatieres', 'qteChatieres', 'prixChatiere',
+        'useSolins', 'longSolins', 'prixSolinML',
+        'prixMainOeuvreM2', 'forfaitDiversHT'
+      ];
+
+      function writeStateToStaticInputs() {
+        STATIC_FIELDS.forEach(function (key) {
+          var el = document.getElementById(key);
+          if (!el) return;
+          if (el.type === 'checkbox') {
+            el.checked = Boolean(state[key]);
+          } else {
+            el.value = state[key] !== undefined ? state[key] : '';
+          }
+        });
+      }
+
+      function readStaticInputToState(el) {
+        if (!el || !el.id) return;
+        var key = el.id;
+        if (STATIC_FIELDS.indexOf(key) === -1) return;
+
+        if (el.type === 'checkbox') {
+          state[key] = el.checked;
+        } else if (el.type === 'number' || key === 'tauxTva') {
+          state[key] = parseFloat(el.value) || 0;
+        } else {
+          state[key] = el.value;
+        }
+
+        if (key === 'longGouttiere') state.autoGouttiere = false;
+        if (key === 'longRives') state.autoRives = false;
+        if (key === 'longBandesEgout') state.autoBandesEgout = false;
+        if (key === 'longFaitiere') state.autoFaitiere = false;
+        if (key === 'qteChatieres') state.autoChatieres = false;
+      }
+
+      /* =====================================================================
+         SCHÉMAS SVG DES PANS
+         ===================================================================== */
+      function buildPanSvg(pan, totalArea, slantedEdge) {
+        var lTxt = round1(pan.L) + 'm';
+        var hTxt = round1(pan.H) + 'm';
+        var bTxt = round1(slantedEdge) + 'm';
+        var aTxt = round1(totalArea) + ' m²';
+        var shapeHtml = '';
+
+        if (pan.type === 'rect') {
+          shapeHtml =
+            '<rect x="40" y="18" width="130" height="62" fill="#dbeafe" stroke="#2563eb" stroke-width="2.2" rx="2"/>' +
+            '<text x="105" y="13" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1e3a8a">Faîtage : ' + lTxt + '</text>' +
+            '<text x="105" y="93" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f172a">Égout : ' + lTxt + '</text>' +
+            '<text x="20" y="52" text-anchor="middle" font-size="9.5" font-weight="700" fill="#2563eb">' + hTxt + '</text>' +
+            '<text x="105" y="53" text-anchor="middle" font-size="11" font-weight="800" fill="#1e40af">' + aTxt + '</text>';
+        } else if (pan.type === 'tri_left') {
+          shapeHtml =
+            '<polygon points="165,18 165,80 45,80" fill="#ffedd5" stroke="#ea580c" stroke-width="2.2" stroke-linejoin="round"/>' +
+            '<polyline points="155,80 155,70 165,70" fill="none" stroke="#9a3412" stroke-width="1.3"/>' +
+            '<text x="105" y="93" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f172a">Base L : ' + lTxt + '</text>' +
+            '<text x="186" y="52" text-anchor="middle" font-size="9.5" font-weight="700" fill="#9a3412">' + hTxt + '</text>' +
+            '<text x="95" y="42" text-anchor="end" font-size="9" font-weight="700" fill="#ea580c">Biais ' + bTxt + '</text>' +
+            '<text x="132" y="68" text-anchor="middle" font-size="10.5" font-weight="800" fill="#9a3412">' + aTxt + '</text>';
+        } else if (pan.type === 'tri_right') {
+          shapeHtml =
+            '<polygon points="45,18 45,80 165,80" fill="#ffedd5" stroke="#ea580c" stroke-width="2.2" stroke-linejoin="round"/>' +
+            '<polyline points="45,70 55,70 55,80" fill="none" stroke="#9a3412" stroke-width="1.3"/>' +
+            '<text x="105" y="93" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f172a">Base L : ' + lTxt + '</text>' +
+            '<text x="24" y="52" text-anchor="middle" font-size="9.5" font-weight="700" fill="#9a3412">' + hTxt + '</text>' +
+            '<text x="115" y="42" text-anchor="start" font-size="9" font-weight="700" fill="#ea580c">Biais ' + bTxt + '</text>' +
+            '<text x="78" y="68" text-anchor="middle" font-size="10.5" font-weight="800" fill="#9a3412">' + aTxt + '</text>';
+        } else {
+          shapeHtml =
+            '<polygon points="105,18 42,80 168,80" fill="#e2e8f0" stroke="#334155" stroke-width="2.2" stroke-linejoin="round"/>' +
+            '<line x1="105" y1="18" x2="105" y2="80" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3,2"/>' +
+            '<text x="105" y="93" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f172a">Égout L : ' + lTxt + '</text>' +
+            '<text x="105" y="13" text-anchor="middle" font-size="9" font-weight="700" fill="#334155">Pente ' + hTxt + ' • Arêtier ' + bTxt + '</text>' +
+            '<text x="105" y="66" text-anchor="middle" font-size="10.5" font-weight="800" fill="#0f172a">' + aTxt + '</text>';
+        }
+
+        return '<svg viewBox="0 0 210 100" class="w-full h-24">' + shapeHtml + '</svg>' +
+          '<div class="text-[10px] font-bold text-slate-500 text-center">' +
+          pan.qty + (pan.qty > 1 ? ' pans identiques (' : ' pan (') + aTxt + ')</div>';
+      }
+
+      function renderPansList() {
+        var container = document.getElementById('pansContainer');
+        if (!container) return;
+
+        container.innerHTML = state.pans.map(function (pan, idx) {
+          var singleArea = pan.type === 'rect' ? (pan.L * pan.H) : ((pan.L * pan.H) / 2);
+          var totalArea = singleArea * pan.qty;
+          var slanted = pan.type === 'rect' ? pan.H :
+            (pan.type === 'croupe' ? Math.sqrt(Math.pow(pan.L / 2, 2) + Math.pow(pan.H, 2)) : Math.sqrt(Math.pow(pan.L, 2) + Math.pow(pan.H, 2)));
+
+          return '' +
+            '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 transition hover:border-blue-300" data-pan-id="' + pan.id + '">' +
+              '<div class="flex flex-wrap items-center justify-between gap-2 mb-3">' +
+                '<div class="flex items-center gap-2 flex-1 min-w-[200px]">' +
+                  '<span class="bg-slate-800 text-white text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">PAN ' + (idx + 1) + '</span>' +
+                  '<input type="text" data-pan-field="label" data-pan-id="' + pan.id + '" value="' + escapeHtml(pan.label) + '" class="font-bold text-sm text-slate-800 bg-white border border-slate-300 rounded-lg px-2.5 py-1 flex-1">' +
+                '</div>' +
+                '<button type="button" data-remove-pan="' + pan.id + '" class="text-xs text-rose-600 hover:bg-rose-50 px-2.5 py-1 rounded-lg font-bold transition">✕ Retirer</button>' +
+              '</div>' +
+              '<div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">' +
+                '<div class="md:col-span-8 space-y-2.5">' +
+                  '<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">' +
+                    '<div class="col-span-2 sm:col-span-1">' +
+                      '<label class="block text-[11px] font-bold text-slate-600 mb-1">Forme</label>' +
+                      '<select data-pan-field="type" data-pan-id="' + pan.id + '" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-bold bg-white">' +
+                        '<option value="rect"' + (pan.type === 'rect' ? ' selected' : '') + '>Rectangle ▭</option>' +
+                        '<option value="tri_left"' + (pan.type === 'tri_left' ? ' selected' : '') + '>Triangle Gauche ◢</option>' +
+                        '<option value="tri_right"' + (pan.type === 'tri_right' ? ' selected' : '') + '>Triangle Droite ◣</option>' +
+                        '<option value="croupe"' + (pan.type === 'croupe' ? ' selected' : '') + '>Croupe ▲</option>' +
+                      '</select>' +
+                    '</div>' +
+                    '<div>' +
+                      '<label class="block text-[11px] font-bold text-slate-600 mb-1">Longueur bas L (m)</label>' +
+                      '<input type="number" data-pan-field="L" data-pan-id="' + pan.id + '" value="' + pan.L + '" min="0.1" step="0.1" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-bold bg-white">' +
+                    '</div>' +
+                    '<div>' +
+                      '<label class="block text-[11px] font-bold text-slate-600 mb-1">Pente / Haut. H (m)</label>' +
+                      '<input type="number" data-pan-field="H" data-pan-id="' + pan.id + '" value="' + pan.H + '" min="0.1" step="0.1" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-bold bg-white">' +
+                    '</div>' +
+                    '<div>' +
+                      '<label class="block text-[11px] font-bold text-slate-600 mb-1">Nb pans</label>' +
+                      '<select data-pan-field="qty" data-pan-id="' + pan.id + '" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-bold bg-white">' +
+                        '<option value="1"' + (pan.qty == 1 ? ' selected' : '') + '>× 1</option>' +
+                        '<option value="2"' + (pan.qty == 2 ? ' selected' : '') + '>× 2</option>' +
+                        '<option value="3"' + (pan.qty == 3 ? ' selected' : '') + '>× 3</option>' +
+                        '<option value="4"' + (pan.qty == 4 ? ' selected' : '') + '>× 4</option>' +
+                      '</select>' +
+                    '</div>' +
+                  '</div>' +
+                  '<div class="flex flex-wrap gap-4 pt-1">' +
+                    '<label class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 cursor-pointer">' +
+                      '<input type="checkbox" data-pan-field="hasGouttiere" data-pan-id="' + pan.id + '"' + (pan.hasGouttiere !== false ? ' checked' : '') + ' class="w-3.5 h-3.5 text-blue-600 rounded">' +
+                      'Inclure gouttière sur ce pan' +
+                    '</label>' +
+                    '<label class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 cursor-pointer">' +
+                      '<input type="checkbox" data-pan-field="hasRive" data-pan-id="' + pan.id + '"' + (pan.hasRive !== false ? ' checked' : '') + ' class="w-3.5 h-3.5 text-blue-600 rounded">' +
+                      'Inclure rive sur ce pan' +
+                    '</label>' +
+                  '</div>' +
+                '</div>' +
+                '<div id="pan-svg-box-' + pan.id + '" class="md:col-span-4 bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center min-h-[115px]">' +
+                  buildPanSvg(pan, totalArea, slanted) +
+                '</div>' +
+              '</div>' +
+            '</div>';
+        }).join('');
+      }
+
+      function updatePanSvgOnly(pan) {
+        var box = document.getElementById('pan-svg-box-' + pan.id);
+        if (!box) return;
+        var singleArea = pan.type === 'rect' ? (pan.L * pan.H) : ((pan.L * pan.H) / 2);
+        var totalArea = singleArea * pan.qty;
+        var slanted = pan.type === 'rect' ? pan.H :
+          (pan.type === 'croupe' ? Math.sqrt(Math.pow(pan.L / 2, 2) + Math.pow(pan.H, 2)) : Math.sqrt(Math.pow(pan.L, 2) + Math.pow(pan.H, 2)));
+        box.innerHTML = buildPanSvg(pan, totalArea, slanted);
+      }
+
+      /* =====================================================================
+         LIGNES DE COUVERTURE (AVEC PRIX €/m² OU €/u)
+         ===================================================================== */
+      function renderCouverturesList() {
+        var container = document.getElementById('couverturesContainer');
+        if (!container) return;
+
+        container.innerHTML = state.couvertures.map(function (c, idx) {
+          var lbl1 = c.mode === 'plaque' ? 'Largeur utile plaque (cm)' : 'Longueur (cm)';
+          var lbl2 = c.mode === 'plaque' ? 'Longueur plaque (cm)' : 'Largeur (cm)';
+          var hideDims = c.mode === 'surface' ? ' hidden' : '';
+
+          return '' +
+            '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5" data-couv-id="' + c.id + '">' +
+              '<div class="flex items-center justify-between gap-2 mb-2.5">' +
+                '<span class="text-xs font-extrabold text-blue-700 uppercase">Couverture #' + (idx + 1) + '</span>' +
+                '<button type="button" data-remove-couv="' + c.id + '" class="text-xs text-rose-600 hover:bg-rose-50 px-2 py-0.5 rounded font-bold">✕ Supprimer</button>' +
+              '</div>' +
+              '<div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 mb-2.5">' +
+                '<div class="sm:col-span-7">' +
+                  '<label class="block text-[11px] font-bold text-slate-600 mb-1">Désignation</label>' +
+                  '<input type="text" data-couv-field="label" data-couv-id="' + c.id + '" value="' + escapeHtml(c.label) + '" placeholder="Ex : Ardoise 32×22, Bac acier..." class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm bg-white font-semibold">' +
+                '</div>' +
+                '<div class="sm:col-span-5">' +
+                  '<label class="block text-[11px] font-bold text-slate-600 mb-1">Mode de calcul</label>' +
+                  '<select data-couv-field="mode" data-couv-id="' + c.id + '" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-bold bg-white">' +
+                    '<option value="ardoise"' + (c.mode === 'ardoise' ? ' selected' : '') + '>Ardoise (au nombre)</option>' +
+                    '<option value="tuile"' + (c.mode === 'tuile' ? ' selected' : '') + '>Tuile (au nombre)</option>' +
+                    '<option value="plaque"' + (c.mode === 'plaque' ? ' selected' : '') + '>Tôles / Plaques (Bac, Zinc...)</option>' +
+                    '<option value="surface"' + (c.mode === 'surface' ? ' selected' : '') + '>Couverture au m² (estimation)</option>' +
+                  '</select>' +
+                '</div>' +
+              '</div>' +
+              '<div class="grid grid-cols-2 sm:grid-cols-12 gap-2.5 items-end">' +
+                '<div class="sm:col-span-3' + hideDims + '">' +
+                  '<label class="block text-[11px] font-bold text-slate-600 mb-1">' + lbl1 + '</label>' +
+                  '<input type="number" data-couv-field="dim1" data-couv-id="' + c.id + '" value="' + c.dim1 + '" min="1" step="1" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-bold bg-white">' +
+                '</div>' +
+                '<div class="sm:col-span-3' + hideDims + '">' +
+                  '<label class="block text-[11px] font-bold text-slate-600 mb-1">' + lbl2 + '</label>' +
+                  '<input type="number" data-couv-field="dim2" data-couv-id="' + c.id + '" value="' + c.dim2 + '" min="1" step="1" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-bold bg-white">' +
+                '</div>' +
+                '<div class="' + (c.mode === 'surface' ? 'col-span-2 sm:col-span-12' : 'col-span-2 sm:col-span-6') + '">' +
+                  '<label class="block text-[11px] font-bold text-blue-700 mb-1">Prix unitaire HT</label>' +
+                  '<div class="flex gap-1.5">' +
+                    '<input type="number" data-couv-field="prix" data-couv-id="' + c.id + '" value="' + c.prix + '" min="0" step="0.05" class="w-full px-2.5 py-1.5 border-2 border-blue-200 rounded-lg text-sm font-extrabold text-right bg-white">' +
+                    '<select data-couv-field="typePrix" data-couv-id="' + c.id + '" class="px-2 py-1.5 border border-slate-300 rounded-lg text-xs font-extrabold bg-white' + (c.mode === 'surface' ? ' hidden' : '') + '">' +
+                      '<option value="m2"' + (c.typePrix === 'm2' ? ' selected' : '') + '>€/m²</option>' +
+                      '<option value="unite"' + (c.typePrix === 'unite' ? ' selected' : '') + '>€/u</option>' +
+                    '</select>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div id="couv-preview-' + c.id + '" class="mt-2.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg"></div>' +
+            '</div>';
+        }).join('');
+      }
+
+      /* =====================================================================
+         MOTEUR DE CALCUL MÉTRÉ & CHIFFRAGE ESTIMATIF
+         ===================================================================== */
+      function recalculateAndRender() {
+        var marge = Math.max(0, Number(state.margePertes) || 0);
+        var margeFactor = 1 + (marge / 100);
+
+        // 1. Calculs géométriques sur tous les pans
+        var totalSurface = 0;
+        var totalEgoutAllML = 0;
+        var totalEgoutGouttiereML = 0;
+        var totalRivesML = 0;
+        var totalFaitageML = 0;
+        var hasTriangle = false;
+
+        var ecartChevronM = Math.max(0.10, (Number(state.ecartChevron) || 60) / 100);
+        var ecartTasseauM = Math.max(0.05, (Number(state.ecartTasseau) || 30) / 100);
+        var ecartContreLatteM = Math.max(0.10, (Number(state.ecartContreLatte) || 60) / 100);
+
+        var totalChevronsML = 0;
+        var totalTasseauxML = 0;
+        var totalContreLattesML = 0;
+
+        state.pans.forEach(function (pan) {
+          var L = Math.max(0, Number(pan.L) || 0);
+          var H = Math.max(0, Number(pan.H) || 0);
+          var qty = Math.max(1, parseInt(pan.qty, 10) || 1);
+
+          var areaOne = pan.type === 'rect' ? (L * H) : ((L * H) / 2);
+          var slanted = pan.type === 'rect' ? H :
+            (pan.type === 'croupe' ? Math.sqrt(Math.pow(L / 2, 2) + Math.pow(H, 2)) : Math.sqrt(Math.pow(L, 2) + Math.pow(H, 2)));
+
+          totalSurface += areaOne * qty;
+          totalEgoutAllML += L * qty;
+          if (pan.hasGouttiere !== false) {
+            totalEgoutGouttiereML += L * qty;
+          }
+
+          if (pan.type === 'rect') {
+            if (pan.hasRive !== false) totalRivesML += (H * 2) * qty;
+            totalFaitageML += (qty === 2) ? L : (L * qty);
+          } else if (pan.type === 'tri_left' || pan.type === 'tri_right') {
+            hasTriangle = true;
+            if (pan.hasRive !== false) totalRivesML += (H + slanted) * qty;
+          } else if (pan.type === 'croupe') {
+            hasTriangle = true;
+            if (pan.hasRive !== false) totalRivesML += (slanted * 2) * qty;
+          }
+
+          var avgWidth = pan.type === 'rect' ? L : (L / 2);
+          var avgSlope = pan.type === 'rect' ? H : (H / 2);
+          var triWaste = pan.type === 'rect' ? 1 : 1.10;
+
+          var colsRafters = Math.ceil(L / ecartChevronM) + 1;
+          totalChevronsML += (colsRafters * avgSlope * qty) * triWaste;
+
+          var rowsBattens = Math.ceil(H / ecartTasseauM) + 1;
+          totalTasseauxML += (rowsBattens * avgWidth * qty) * triWaste;
+
+          var colsCounter = Math.ceil(L / ecartContreLatteM) + 1;
+          totalContreLattesML += (colsCounter * avgSlope * qty) * triWaste;
+        });
+
+        var tipBox = document.getElementById('triangleTipBox');
+        if (tipBox) {
+          if (hasTriangle) tipBox.classList.remove('hidden');
+          else tipBox.classList.add('hidden');
+        }
+
+        // Valeurs Auto pour zinguerie, faîtage et chatières
+        if (state.autoGouttiere) {
+          state.longGouttiere = round1(totalEgoutGouttiereML);
+          var elG = document.getElementById('longGouttiere');
+          if (elG && document.activeElement !== elG) elG.value = state.longGouttiere;
+        }
+        if (state.autoRives) {
+          state.longRives = round1(totalRivesML);
+          var elR = document.getElementById('longRives');
+          if (elR && document.activeElement !== elR) elR.value = state.longRives;
+        }
+        if (state.autoBandesEgout) {
+          state.longBandesEgout = round1(totalEgoutAllML);
+          var elBE = document.getElementById('longBandesEgout');
+          if (elBE && document.activeElement !== elBE) elBE.value = state.longBandesEgout;
+        }
+        if (state.autoFaitiere) {
+          state.longFaitiere = round1(totalFaitageML);
+          var elF = document.getElementById('longFaitiere');
+          if (elF && document.activeElement !== elF) elF.value = state.longFaitiere;
+        }
+        if (state.autoChatieres) {
+          state.qteChatieres = totalSurface > 0 ? Math.max(2, Math.ceil(totalSurface / 20)) : 0;
+          var elCh = document.getElementById('qteChatieres');
+          if (elCh && document.activeElement !== elCh) elCh.value = state.qteChatieres;
+        }
+
+        // 2. Construction des lignes chiffrées
+        var rows = [];
+        var totalFournituresHT = 0;
+        var totalMoHT = 0;
+
+        function addRow(title, detail, qty, unit, puHT, isLabor) {
+          var subTotal = round2(qty * puHT);
+          if (isLabor) totalMoHT += subTotal;
+          else totalFournituresHT += subTotal;
+          rows.push({
+            title: title,
+            detail: detail,
+            qty: round2(qty),
+            unit: unit,
+            puHT: round2(puHT),
+            subTotal: subTotal
+          });
+        }
+
+        // --- COUVERTURE ---
+        var totalArdoises = 0;
+        var hasArdoise = false;
+        var hasPlaque = false;
+
+        state.couvertures.forEach(function (c) {
+          var dim1 = Math.max(1, Number(c.dim1) || 32);
+          var dim2 = Math.max(1, Number(c.dim2) || 22);
+          var prix = Math.max(0, Number(c.prix) || 0);
+          var typePrix = c.typePrix || 'm2';
+          var label = (c.label || '').trim() || 'Couverture';
+          var previewEl = document.getElementById('couv-preview-' + c.id);
+
+          if (c.mode === 'ardoise') {
+            hasArdoise = true;
+            var usefulArea = (dim1 / 100) * (dim2 / 100) * 0.38;
+            var nbParM2 = Math.ceil(1 / usefulArea);
+            var qteNet = Math.ceil(totalSurface * nbParM2);
+            var qteFinal = Math.ceil(qteNet * margeFactor);
+            totalArdoises += qteFinal;
+
+            var puUnite = (typePrix === 'm2') ? (prix / nbParM2) : prix;
+            var totalLigne = round2(qteFinal * puUnite);
+
+            if (previewEl) {
+              previewEl.textContent = '≈ ' + nbParM2 + ' ard./m² → ' + qteFinal + ' ardoises (+' + marge + '%) • P.U. ≈ ' + formatEuro(puUnite) + '/u → ' + formatEuro(totalLigne) + ' HT';
+            }
+            addRow(label + ' (' + dim1 + '×' + dim2 + ' cm)', '≈ ' + nbParM2 + ' ardoises/m² (marge +' + marge + '%)', qteFinal, 'ardoises', puUnite, false);
+
+          } else if (c.mode === 'tuile') {
+            var usefulAreaT = (dim1 / 100) * (dim2 / 100) * 0.65;
+            var nbParM2T = Math.ceil(1 / usefulAreaT);
+            var qteNetT = Math.ceil(totalSurface * nbParM2T);
+            var qteFinalT = Math.ceil(qteNetT * margeFactor);
+
+            var puUniteT = (typePrix === 'm2') ? (prix / nbParM2T) : prix;
+            var totalLigneT = round2(qteFinalT * puUniteT);
+
+            if (previewEl) {
+              previewEl.textContent = '≈ ' + nbParM2T + ' tuiles/m² → ' + qteFinalT + ' tuiles (+' + marge + '%) • P.U. ≈ ' + formatEuro(puUniteT) + '/u → ' + formatEuro(totalLigneT) + ' HT';
+            }
+            addRow(label + ' (' + dim1 + '×' + dim2 + ' cm)', '≈ ' + nbParM2T + ' tuiles/m² (marge +' + marge + '%)', qteFinalT, 'tuiles', puUniteT, false);
+
+          } else if (c.mode === 'plaque') {
+            hasPlaque = true;
+            var largUtileM = dim1 / 100;
+            var longPlaqueM = dim2 / 100;
+            var netPlaques = 0;
+
+            state.pans.forEach(function (pan) {
+              var L = Math.max(0, Number(pan.L) || 0);
+              var H = Math.max(0, Number(pan.H) || 0);
+              var qty = Math.max(1, parseInt(pan.qty, 10) || 1);
+              var nbPlaquesLargeur = Math.ceil(L / largUtileM);
+              var nbRangeesPente = Math.ceil(H / longPlaqueM);
+              var panPlaques = nbPlaquesLargeur * nbRangeesPente * qty;
+              if (pan.type !== 'rect') panPlaques = Math.ceil(panPlaques / 2);
+              netPlaques += panPlaques;
+            });
+
+            var finalPlaques = Math.ceil(netPlaques * margeFactor);
+            var surfUnitairePlaque = largUtileM * longPlaqueM;
+            var puPlaque = (typePrix === 'm2') ? (prix * surfUnitairePlaque) : prix;
+            var totalLigneP = round2(finalPlaques * puPlaque);
+
+            if (previewEl) {
+              previewEl.textContent = netPlaques + ' plaques nettes (' + round2(largUtileM) + '×' + round2(longPlaqueM) + 'm) → ' + finalPlaques + ' plaques (+' + marge + '%) • ' + formatEuro(puPlaque) + '/u → ' + formatEuro(totalLigneP) + ' HT';
+            }
+            addRow(label + ' (' + dim1 + '×' + dim2 + ' cm)', 'Soit ' + round1(finalPlaques * surfUnitairePlaque) + ' m² de plaques (marge +' + marge + '%)', finalPlaques, 'plaques', puPlaque, false);
+
+          } else {
+            var surfM2 = round1(totalSurface * margeFactor);
+            var totalLigneS = round2(surfM2 * prix);
+            if (previewEl) {
+              previewEl.textContent = 'Surface nette ' + round1(totalSurface) + ' m² → ' + surfM2 + ' m² (+' + marge + '%) × ' + formatEuro(prix) + '/m² = ' + formatEuro(totalLigneS) + ' HT';
+            }
+            addRow(label, 'Estimation au m² (marge +' + marge + '%)', surfM2, 'm²', prix, false);
+          }
+        });
+
+        // --- CROCHETS D'ARDOISE (AUTO SI ARDOISE) ---
+        var rowCrochetsArd = document.getElementById('rowCrochetsArdoise');
+        var badgeCrochetsArd = document.getElementById('badgeCrochetsArdoise');
+        if (hasArdoise && totalArdoises > 0) {
+          var nbCrochetsArd = Math.ceil(totalArdoises * 1.05);
+          if (rowCrochetsArd) rowCrochetsArd.classList.remove('hidden');
+          if (badgeCrochetsArd) badgeCrochetsArd.textContent = nbCrochetsArd + ' u';
+          if (state.useCrochetsArdoise) {
+            addRow("Crochets d'ardoise inox", '1 crochet / ardoise + 5% réserve', nbCrochetsArd, 'crochets', Number(state.prixCrochetArdoise) || 0, false);
+          }
+        } else {
+          if (rowCrochetsArd) rowCrochetsArd.classList.add('hidden');
+        }
+
+        // --- TIREFONDS & CAVALIERS (AUTO SI PLAQUES) ---
+        var rowTirefonds = document.getElementById('rowTirefonds');
+        var badgeTirefonds = document.getElementById('badgeTirefonds');
+        if (hasPlaque && totalSurface > 0) {
+          var nbTirefonds = Math.ceil(totalSurface * 6);
+          if (rowTirefonds) rowTirefonds.classList.remove('hidden');
+          if (badgeTirefonds) badgeTirefonds.textContent = nbTirefonds + ' u';
+          addRow('Tirefonds / Vis autoperceuses + cavaliers', 'Fixation tôles / bac acier (~6/m²)', nbTirefonds, 'u', Number(state.prixTirefond) || 0, false);
+        } else {
+          if (rowTirefonds) rowTirefonds.classList.add('hidden');
+        }
+
+        // --- POINTES / VIS ---
+        if (state.usePointes && totalSurface > 0) {
+          var nbPointes = Math.ceil(totalSurface * (Number(state.ratioPointes) || 15));
+          addRow('Pointes / Vis de liteaunage', '~' + state.ratioPointes + ' fixations / m²', nbPointes, 'u', Number(state.prixPointe) || 0, false);
+        }
+
+        // --- CHEVRONS ---
+        if (state.useChevrons && totalChevronsML > 0) {
+          var longChev = Math.max(0.5, Number(state.longChevron) || 5);
+          var barresChev = Math.ceil(totalChevronsML / longChev);
+          var mlChevRounded = Math.ceil(totalChevronsML);
+          var puChevML = Number(state.prixChevronML) || 0;
+          var puBarreChev = round2(puChevML * longChev);
+
+          document.getElementById('badgeChevrons').textContent = barresChev + ' barres';
+          document.getElementById('mlChevronsInfo').textContent = mlChevRounded + ' ml';
+          document.getElementById('prixBarreChevronInfo').textContent = formatEuro(puBarreChev) + ' / barre';
+
+          addRow(
+            'Chevrons ' + state.chevronEp + '×' + state.chevronLarg + ' mm',
+            barresChev + ' barres de ' + longChev + 'm (soit ' + mlChevRounded + ' ml à ' + formatEuro(puChevML) + '/ml)',
+            barresChev, 'barres', puBarreChev, false
+          );
+        } else {
+          document.getElementById('badgeChevrons').textContent = 'Désactivé';
+          document.getElementById('mlChevronsInfo').textContent = '0 ml';
+        }
+
+        // --- TASSEAUX / LITEAUX ---
+        if (state.useTasseaux && totalTasseauxML > 0) {
+          var longTass = Math.max(0.5, Number(state.longTasseau) || 4);
+          var barresTass = Math.ceil(totalTasseauxML / longTass);
+          var mlTassRounded = Math.ceil(totalTasseauxML);
+          var puTassML = Number(state.prixTasseauML) || 0;
+          var puBarreTass = round2(puTassML * longTass);
+
+          document.getElementById('badgeTasseaux').textContent = barresTass + ' barres';
+          document.getElementById('mlTasseauxInfo').textContent = mlTassRounded + ' ml';
+          document.getElementById('prixBarreTasseauInfo').textContent = formatEuro(puBarreTass) + ' / barre';
+
+          addRow(
+            'Tasseaux / Liteaux ' + state.tasseauEp + '×' + state.tasseauLarg + ' mm',
+            barresTass + ' barres de ' + longTass + 'm (soit ' + mlTassRounded + ' ml à ' + formatEuro(puTassML) + '/ml)',
+            barresTass, 'barres', puBarreTass, false
+          );
+        } else {
+          document.getElementById('badgeTasseaux').textContent = 'Désactivé';
+          document.getElementById('mlTasseauxInfo').textContent = '0 ml';
+        }
+
+        // --- CONTRE-LATTES ---
+        if (state.useContreLattes && totalContreLattesML > 0) {
+          var longCL = Math.max(0.5, Number(state.longContreLatte) || 4);
+          var barresCL = Math.ceil(totalContreLattesML / longCL);
+          var mlCLRounded = Math.ceil(totalContreLattesML);
+          var puCLML = Number(state.prixContreLatteML) || 0;
+          var puBarreCL = round2(puCLML * longCL);
+
+          document.getElementById('badgeContreLattes').textContent = barresCL + ' barres';
+          document.getElementById('mlContreLattesInfo').textContent = mlCLRounded + ' ml';
+          document.getElementById('prixBarreContreLatteInfo').textContent = formatEuro(puBarreCL) + ' / barre';
+
+          addRow(
+            'Contre-lattes ' + state.contreLatteEp + '×' + state.contreLatteLarg + ' mm',
+            barresCL + ' barres de ' + longCL + 'm (soit ' + mlCLRounded + ' ml à ' + formatEuro(puCLML) + '/ml)',
+            barresCL, 'barres', puBarreCL, false
+          );
+        } else {
+          document.getElementById('badgeContreLattes').textContent = 'Désactivé';
+          document.getElementById('mlContreLattesInfo').textContent = '0 ml';
+        }
+
+        // --- ÉCRAN SOUS-TOITURE ---
+        if (state.useEcran && totalSurface > 0) {
+          var recouv = 1 + ((Number(state.ecranRecouvrement) || 10) / 100);
+          var surfEcran = Math.ceil(totalSurface * recouv);
+          var rouleauM2 = Math.max(1, Number(state.ecranRouleauM2) || 75);
+          var nbRouleaux = Math.ceil(surfEcran / rouleauM2);
+          document.getElementById('badgeEcran').textContent = surfEcran + ' m² (' + nbRouleaux + ' roul.)';
+
+          addRow(
+            'Écran sous-toiture HPV',
+            nbRouleaux + ' rouleau(x) de ' + rouleauM2 + ' m² (+' + state.ecranRecouvrement + '% recouvr.)',
+            surfEcran, 'm²', Number(state.prixEcranM2) || 0, false
+          );
+        } else {
+          document.getElementById('badgeEcran').textContent = 'Désactivé';
+        }
+
+        // --- GOUTTIÈRES & CROCHETS ---
+        var longGout = Math.max(0, Number(state.longGouttiere) || 0);
+        if (state.useGouttiere && longGout > 0) {
+          var entraxeGoutCm = Math.max(10, Number(state.entraxeCrochetsGouttiere) || 50);
+          var nbCrochetsGout = Math.ceil(longGout / (entraxeGoutCm / 100)) + 2;
+          document.getElementById('badgeCrochetsGouttiere').textContent = nbCrochetsGout + ' crochets';
+
+          addRow('Gouttières', 'Linéaire d\'égout équipé', round1(longGout), 'ml', Number(state.prixGouttiereML) || 0, false);
+          addRow('Crochets de gouttière', '1 crochet tous les ' + entraxeGoutCm + ' cm', nbCrochetsGout, 'crochets', Number(state.prixCrochetGouttiere) || 0, false);
+
+          var qteAccGout = parseInt(state.qteAccessoiresGouttiere, 10) || 0;
+          if (qteAccGout > 0) {
+            addRow('Naissances / Talons / Angles gouttière', 'Accessoires de raccordement', qteAccGout, 'u', Number(state.prixAccessoireGouttiere) || 0, false);
+          }
+        } else {
+          document.getElementById('badgeCrochetsGouttiere').textContent = '0 crochets';
+        }
+
+        // --- TUYAUX DE DESCENTE & COLLIERS MURAUX ---
+        var nbDesc = Math.max(0, parseInt(state.nbDescentes, 10) || 0);
+        var hautDesc = Math.max(0, Number(state.hauteurDescente) || 0);
+        var totalDescML = round1(nbDesc * hautDesc);
+        if (state.useDescente && totalDescML > 0) {
+          var entraxeCollM = Math.max(0.3, Number(state.entraxeColliers) || 1.5);
+          var nbColliers = Math.max(nbDesc * 2, Math.ceil(totalDescML / entraxeCollM) + nbDesc);
+          document.getElementById('badgeColliersMur').textContent = nbColliers + ' colliers';
+
+          addRow('Tuyaux de descente', nbDesc + ' descente(s) × ' + hautDesc + ' m', totalDescML, 'ml', Number(state.prixDescenteML) || 0, false);
+          addRow('Colliers de fixation murale', '1 collier tous les ' + entraxeCollM + ' m', nbColliers, 'colliers', Number(state.prixCollierMur) || 0, false);
+
+          var qteCoudes = parseInt(state.qteCoudes, 10) || 0;
+          if (qteCoudes > 0) {
+            addRow('Coudes de descente', 'Raccordement dauphins / pieds', qteCoudes, 'u', Number(state.prixCoude) || 0, false);
+          }
+        } else {
+          document.getElementById('badgeColliersMur').textContent = '0 colliers';
+        }
+
+        // --- BANDES DE RIVE & ÉGOUT ---
+        if (state.useRives && Number(state.longRives) > 0) {
+          addRow('Bandes de rive zinc / alu', 'Habillage rives droites & biais', round1(state.longRives), 'ml', Number(state.prixRiveML) || 0, false);
+        }
+        if (state.useBandesEgout && Number(state.longBandesEgout) > 0) {
+          addRow("Bandes d'égout / Larmiers", 'Protection bas de pente', round1(state.longBandesEgout), 'ml', Number(state.prixBandeEgoutML) || 0, false);
+        }
+
+        // --- FAÎTIÈRES, CLOSOIR, CHATIÈRES & SOLINS ---
+        var longFait = Math.max(0, Number(state.longFaitiere) || 0);
+        if (state.useFaitiere && longFait > 0) {
+          addRow('Faîtières / Arêtiers', 'Linéaire de faîtage', round1(longFait), 'ml', Number(state.prixFaitiereML) || 0, false);
+          if (state.useClosoir) {
+            addRow('Closoir ventilé sous faîtage', 'Étanchéité et ventilation faîtage', round1(longFait), 'ml', Number(state.prixClosoirML) || 0, false);
+          }
+        }
+        if (state.useChatieres && parseInt(state.qteChatieres, 10) > 0) {
+          addRow('Chatières de ventilation', 'Ventilation sous couverture', parseInt(state.qteChatieres, 10), 'u', Number(state.prixChatiere) || 0, false);
+        }
+        if (state.useSolins && Number(state.longSolins) > 0) {
+          addRow('Solins / Porte-solins muraux', 'Étanchéité contre maçonnerie', round1(state.longSolins), 'ml', Number(state.prixSolinML) || 0, false);
+        }
+
+        // --- MAIN-D'ŒUVRE & FRAIS DIVERS ---
+        var puMo = Math.max(0, Number(state.prixMainOeuvreM2) || 0);
+        if (puMo > 0 && totalSurface > 0) {
+          addRow("Main-d'œuvre pose & dépose", 'Calculée sur ' + round1(totalSurface) + ' m²', round1(totalSurface), 'm²', puMo, true);
+        }
+        var forfait = Math.max(0, Number(state.forfaitDiversHT) || 0);
+        if (forfait > 0) {
+          addRow('Forfait échafaudage / benne / divers', 'Frais fixes de chantier', 1, 'forfait', forfait, true);
+        }
+
+        // 3. Totaux HT / TVA / TTC
+        totalFournituresHT = round2(totalFournituresHT);
+        totalMoHT = round2(totalMoHT);
+        var totalGeneralHT = round2(totalFournituresHT + totalMoHT);
+        var tvaRate = Number(state.tauxTva) || 0;
+        var montantTVA = round2(totalGeneralHT * (tvaRate / 100));
+        var totalGeneralTTC = round2(totalGeneralHT + montantTVA);
+
+        latestRowsForCopy = rows;
+        latestTotalsForCopy = {
+          totalSurface: round1(totalSurface),
+          totalEgout: round1(totalEgoutGouttiereML),
+          totalRives: round1(totalRivesML),
+          totalFaitage: round1(longFait),
+          totalFournituresHT: totalFournituresHT,
+          totalMoHT: totalMoHT,
+          totalGeneralHT: totalGeneralHT,
+          tvaRate: tvaRate,
+          montantTVA: montantTVA,
+          totalGeneralTTC: totalGeneralTTC
+        };
+
+        // 4. Mise à jour de la colonne de droite
+        var clientDisplay = (state.clientNom || '').trim() || 'Non renseigné';
+        var addrDisplay = (state.clientAdresse || '').trim();
+        document.getElementById('recapClientBadge').textContent = 'Client : ' + clientDisplay + (addrDisplay ? ' — ' + addrDisplay : '');
+        document.getElementById('printClientInfo').textContent = 'Futur devis client : ' + clientDisplay;
+        document.getElementById('printAdresseInfo').textContent = addrDisplay ? ('Adresse / Chantier : ' + addrDisplay) : '';
+        document.getElementById('printDateInfo').textContent = 'Édité le ' + new Date().toLocaleDateString('fr-FR');
+
+        document.getElementById('kpiGrid').innerHTML =
+          '<div class="bg-slate-800/90 p-2.5 rounded-xl border border-slate-700 text-center print-dark-reset">' +
+            '<div class="text-[10px] uppercase text-slate-400 font-bold">Surface totale</div>' +
+            '<div class="text-base sm:text-lg font-extrabold text-orange-400">' + round1(totalSurface) + ' m²</div>' +
+          '</div>' +
+          '<div class="bg-slate-800/90 p-2.5 rounded-xl border border-slate-700 text-center print-dark-reset">' +
+            '<div class="text-[10px] uppercase text-slate-400 font-bold">Égout (Goutt.)</div>' +
+            '<div class="text-base sm:text-lg font-extrabold">' + round1(totalEgoutGouttiereML) + ' ml</div>' +
+          '</div>' +
+          '<div class="bg-slate-800/90 p-2.5 rounded-xl border border-slate-700 text-center print-dark-reset">' +
+            '<div class="text-[10px] uppercase text-slate-400 font-bold">Rives / Biais</div>' +
+            '<div class="text-base sm:text-lg font-extrabold">' + round1(totalRivesML) + ' ml</div>' +
+          '</div>' +
+          '<div class="bg-slate-800/90 p-2.5 rounded-xl border border-slate-700 text-center print-dark-reset">' +
+            '<div class="text-[10px] uppercase text-slate-400 font-bold">Faîtage</div>' +
+            '<div class="text-base sm:text-lg font-extrabold">' + round1(longFait) + ' ml</div>' +
+          '</div>';
+
+        document.getElementById('recapTableBody').innerHTML = rows.map(function (r) {
+          return '' +
+            '<tr class="hover:bg-slate-700/40">' +
+              '<td class="py-2 px-3">' +
+                '<div class="font-bold text-white print-dark-reset">' + escapeHtml(r.title) + '</div>' +
+                '<div class="text-[10px] text-slate-400">' + escapeHtml(r.detail) + '</div>' +
+              '</td>' +
+              '<td class="py-2 px-2 text-right whitespace-nowrap font-extrabold text-orange-300 print-dark-reset">' +
+                r.qty + ' <span class="text-[10px] font-semibold text-slate-300 print-dark-reset">' + escapeHtml(r.unit) + '</span>' +
+              '</td>' +
+              '<td class="py-2 px-2 text-right whitespace-nowrap text-slate-300 print-dark-reset">' +
+                formatEuro(r.puHT) +
+              '</td>' +
+              '<td class="py-2 px-3 text-right whitespace-nowrap font-extrabold text-white print-dark-reset">' +
+                formatEuro(r.subTotal) +
+              '</td>' +
+            '</tr>';
+        }).join('');
+
+        document.getElementById('totalFournituresHT').textContent = formatEuro(totalFournituresHT);
+        document.getElementById('totalMoHT').textContent = formatEuro(totalMoHT);
+        document.getElementById('totalGeneralHT').textContent = formatEuro(totalGeneralHT);
+        document.getElementById('labelMontantTVA').textContent = 'TVA (' + tvaRate.toLocaleString('fr-FR') + ' %) :';
+        document.getElementById('montantTVA').textContent = formatEuro(montantTVA);
+        document.getElementById('totalGeneralTTC').textContent = formatEuro(totalGeneralTTC);
+
+        saveToLocalStorage();
+      }
+
+      /* =====================================================================
+         DÉLÉGATION D'ÉVÉNEMENTS GLOBALE (INPUT, CHANGE, CLICK)
+         ===================================================================== */
+      function handleFormUpdate(event) {
+        var target = event.target;
+        if (!target) return;
+
+        // 1. Mise à jour d'un champ de Pan
+        if (target.dataset && target.dataset.panField) {
+          var panId = parseInt(target.dataset.panId, 10);
+          var field = target.dataset.panField;
+          var pan = state.pans.find(function (p) { return p.id === panId; });
+          if (pan) {
+            if (field === 'L' || field === 'H') {
+              pan[field] = parseFloat(target.value) || 0;
+              updatePanSvgOnly(pan);
+            } else if (field === 'qty') {
+              pan[field] = parseInt(target.value, 10) || 1;
+              updatePanSvgOnly(pan);
+            } else if (field === 'type') {
+              pan[field] = target.value;
+              updatePanSvgOnly(pan);
+            } else if (field === 'hasGouttiere' || field === 'hasRive') {
+              pan[field] = target.checked;
+            } else {
+              pan[field] = target.value;
+            }
+          }
+          recalculateAndRender();
+          return;
+        }
+
+        // 2. Mise à jour d'une ligne de Couverture
+        if (target.dataset && target.dataset.couvField) {
+          var couvId = parseInt(target.dataset.couvId, 10);
+          var cField = target.dataset.couvField;
+          var couv = state.couvertures.find(function (c) { return c.id === couvId; });
+          if (couv) {
+            if (cField === 'mode') {
+              couv.mode = target.value;
+              if (couv.mode === 'plaque') {
+                couv.dim1 = 100;
+                couv.dim2 = 500;
+                couv.prix = 16.50;
+                couv.typePrix = 'm2';
+              } else if (couv.mode === 'ardoise') {
+                couv.dim1 = 32;
+                couv.dim2 = 22;
+                couv.prix = 32.00;
+                couv.typePrix = 'm2';
+              } else if (couv.mode === 'tuile') {
+                couv.dim1 = 35;
+                couv.dim2 = 22;
+                couv.prix = 24.00;
+                couv.typePrix = 'm2';
+              } else {
+                couv.prix = 30.00;
+                couv.typePrix = 'm2';
+              }
+              renderCouverturesList();
+            } else if (cField === 'dim1' || cField === 'dim2' || cField === 'prix') {
+              couv[cField] = parseFloat(target.value) || 0;
+            } else {
+              couv[cField] = target.value;
+            }
+          }
+          recalculateAndRender();
+          return;
+        }
+
+        // 3. Mise à jour d'un champ statique
+        readStaticInputToState(target);
+        recalculateAndRender();
+      }
+
+      document.addEventListener('input', handleFormUpdate);
+      document.addEventListener('change', handleFormUpdate);
+
+      document.addEventListener('click', function (event) {
+        var btn = event.target.closest('button');
+        if (!btn) return;
+
+        // Onglets
+        if (btn.dataset && btn.dataset.tab) {
+          var tabId = btn.dataset.tab;
+          document.querySelectorAll('.tab-panel').forEach(function (panel) {
+            panel.classList.add('hidden');
+          });
+          document.querySelectorAll('.tab-btn').forEach(function (tBtn) {
+            tBtn.classList.remove('active');
+            tBtn.classList.add('text-slate-600');
+          });
+          var activePanel = document.getElementById(tabId);
+          if (activePanel) activePanel.classList.remove('hidden');
+          btn.classList.add('active');
+          btn.classList.remove('text-slate-600');
+          return;
+        }
+
+        // Ajouter un pan
+        if (btn.dataset && btn.dataset.addPan) {
+          var shape = btn.dataset.addPan;
+          var labelDefault = shape === 'rect' ? 'Pan rectangle #' + nextPanId :
+            shape === 'tri_left' ? 'Triangle gauche #' + nextPanId :
+            shape === 'tri_right' ? 'Triangle droite #' + nextPanId : 'Croupe #' + nextPanId;
+          state.pans.push({
+            id: nextPanId++,
+            label: labelDefault,
+            type: shape,
+            L: shape === 'rect' ? 8 : 3.5,
+            H: 5,
+            qty: 1,
+            hasGouttiere: true,
+            hasRive: true
+          });
+          renderPansList();
+          recalculateAndRender();
+          return;
+        }
+
+        // Supprimer un pan
+        if (btn.dataset && btn.dataset.removePan) {
+          var removeId = parseInt(btn.dataset.removePan, 10);
+          if (state.pans.length > 1) {
+            state.pans = state.pans.filter(function (p) { return p.id !== removeId; });
+            renderPansList();
+            recalculateAndRender();
+          }
+          return;
+        }
+
+        // Ajouter couverture
+        if (btn.id === 'btnAddCouverture') {
+          state.couvertures.push({
+            id: nextCouvId++,
+            label: 'Couverture #' + nextCouvId,
+            mode: 'ardoise',
+            dim1: 32,
+            dim2: 22,
+            prix: 32.00,
+            typePrix: 'm2'
+          });
+          renderCouverturesList();
+          recalculateAndRender();
+          return;
+        }
+
+        // Supprimer couverture
+        if (btn.dataset && btn.dataset.removeCouv) {
+          var remCouvId = parseInt(btn.dataset.removeCouv, 10);
+          state.couvertures = state.couvertures.filter(function (c) { return c.id !== remCouvId; });
+          renderCouverturesList();
+          recalculateAndRender();
+          return;
+        }
+
+        // Boutons Auto
+        if (btn.id === 'btnAutoGouttiere') { state.autoGouttiere = true; recalculateAndRender(); return; }
+        if (btn.id === 'btnAutoRives') { state.autoRives = true; recalculateAndRender(); return; }
+        if (btn.id === 'btnAutoEgout') { state.autoBandesEgout = true; recalculateAndRender(); return; }
+        if (btn.id === 'btnAutoFaitiere') { state.autoFaitiere = true; recalculateAndRender(); return; }
+        if (btn.id === 'btnAutoChatieres') { state.autoChatieres = true; recalculateAndRender(); return; }
+
+        // Bouton Générer / Actualiser
+        if (btn.id === 'btnGenerer') {
+          recalculateAndRender();
+          var toast = document.getElementById('toastBadge');
+          var panel = document.getElementById('summaryPanel');
+          if (toast) toast.classList.remove('hidden');
+          if (panel) panel.classList.add('ring-4', 'ring-emerald-400', 'rounded-2xl');
+          setTimeout(function () {
+            if (toast) toast.classList.add('hidden');
+            if (panel) panel.classList.remove('ring-4', 'ring-emerald-400', 'rounded-2xl');
+          }, 1500);
+          return;
+        }
+
+        // Bouton Copier le récapitulatif complet
+        if (btn.id === 'btnCopierListe') {
+          var client = (state.clientNom || '').trim() || 'Chantier Toiture';
+          var adresse = (state.clientAdresse || '').trim();
+          var t = latestTotalsForCopy;
+
+          var lines = [
+            'DEVIS TOITURES JEAN-LUC ET FLORIAN — MÉTRÉ & CHIFFRAGE ESTIMATIF',
+            'Client : ' + client
+          ];
+          if (adresse) lines.push('Chantier : ' + adresse);
+          lines.push('Surface : ' + t.totalSurface + ' m² | Égout : ' + t.totalEgout + ' ml | Rives : ' + t.totalRives + ' ml | Faîtage : ' + t.totalFaitage + ' ml');
+          lines.push('----------------------------------------------------------------');
+          latestRowsForCopy.forEach(function (r) {
+            lines.push('• ' + r.title + ' [' + r.detail + '] : ' + r.qty + ' ' + r.unit + ' × ' + formatEuro(r.puHT) + ' = ' + formatEuro(r.subTotal) + ' HT');
+          });
+          lines.push('----------------------------------------------------------------');
+          lines.push('Total Fournitures HT : ' + formatEuro(t.totalFournituresHT));
+          lines.push('Total Main-d\'œuvre & Frais HT : ' + formatEuro(t.totalMoHT));
+          lines.push('TOTAL GÉNÉRAL HT : ' + formatEuro(t.totalGeneralHT));
+          lines.push('TVA (' + t.tvaRate + ' %) : ' + formatEuro(t.montantTVA));
+          lines.push('TOTAL ESTIMATIF TTC : ' + formatEuro(t.totalGeneralTTC));
+
+          var ta = document.createElement('textarea');
+          ta.value = lines.join('\n');
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+
+          var origHtml = btn.innerHTML;
+          btn.innerHTML = '✓ Récapitulatif copié !';
+          btn.classList.replace('bg-blue-600', 'bg-emerald-600');
+          setTimeout(function () {
+            btn.innerHTML = origHtml;
+            btn.classList.replace('bg-emerald-600', 'bg-blue-600');
+          }, 2000);
+          return;
+        }
+
+        // Bouton Sauvegarder sous...
+        if (btn.id === 'btnSauvegarderSous') {
+          var rawName = (state.clientNom || 'Client').trim().replace(/[^a-zA-Z0-9À-ÿ_-]+/g, '_').replace(/^_|_$/g, '');
+          var dateStr = new Date().toISOString().slice(0, 10);
+          var fileName = 'Devis_Jean-Luc_Florian_' + (rawName || 'Client') + '_' + dateStr + '.json';
+          var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+          var url = URL.createObjectURL(blob);
+          var link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          return;
+        }
+
+        // Imprimer
+        if (btn.id === 'btnImprimer') {
+          recalculateAndRender();
+          window.print();
+          return;
+        }
+
+        // Modale réinitialisation
+        if (btn.id === 'btnNouveauChantier') {
+          var modal = document.getElementById('modalConfirmReset');
+          if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+          return;
+        }
+        if (btn.id === 'btnCancelReset') {
+          var modalC = document.getElementById('modalConfirmReset');
+          if (modalC) { modalC.classList.add('hidden'); modalC.classList.remove('flex'); }
+          return;
+        }
+        if (btn.id === 'btnConfirmReset') {
+          localStorage.removeItem(STORAGE_KEY);
+          location.reload();
+        }
+      });
+
+      // Chargement d'un dossier .json
+      var fileInput = document.getElementById('inputOuvrirDossier');
+      if (fileInput) {
+        fileInput.addEventListener('change', function (e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function (ev) {
+            try {
+              var loaded = JSON.parse(ev.target.result);
+              if (loaded && Array.isArray(loaded.pans)) {
+                state = Object.assign({}, state, loaded);
+                nextPanId = state.pans.reduce(function (m, p) { return Math.max(m, p.id); }, 0) + 1;
+                nextCouvId = (state.couvertures || []).reduce(function (m, c) { return Math.max(m, c.id); }, 0) + 1;
+                writeStateToStaticInputs();
+                renderPansList();
+                renderCouverturesList();
+                recalculateAndRender();
+              }
+            } catch (err) {}
+          };
+          reader.readAsText(file);
+          e.target.value = '';
+        });
+      }
+
+      /* =====================================================================
+         INITIALISATION AU CHARGEMENT
+         ===================================================================== */
+      function initApp() {
+        loadFromLocalStorage();
+        writeStateToStaticInputs();
+        renderPansList();
+        renderCouverturesList();
+        recalculateAndRender();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
+      }
+    })();
+  </script>
+</body>
+</html>
